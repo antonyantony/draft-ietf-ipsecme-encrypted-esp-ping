@@ -3,7 +3,8 @@
 <!-- Required for schema validation and schema-aware editing -->
 <!-- <?xml-stylesheet type="text/xsl" href="rfc2629.xslt" ?> -->
 <!-- This third-party XSLT can be enabled for direct transformations in XML processors, including most browsers -->
-<!DOCTYPE rfc [
+<!DOCTYPE rfc
+[
 <!ENTITY nbsp "&#160;">
 <!ENTITY zwsp "&#8203;">
 <!ENTITY nbhy "&#8209;">
@@ -11,167 +12,176 @@
 ]>
 <!-- If further character entities are required then they should be added to the DOCTYPE above.
      Use of an external entity file is not recommended. -->
-<rfc xmlns:xi="http://www.w3.org/2001/XInclude" category="std" docName="draft-antony-ipsecme-encrypted-esp-ping" ipr="trust200902" obsoletes="" submissionType="IETF" xml:lang="en" version="3">
+<rfc xmlns:xi="http://www.w3.org/2001/XInclude" category="std"
+docName="draft-antony-ipsecme-encrypted-esp-ping-00" ipr="trust200902"
+obsoletes="" submissionType="IETF" xml:lang="en" version="3">
   <front>
     <title abbrev="esp-encrypted-ping">ESP Encrypted Echo Protocol</title>
-    <seriesInfo name="Internet-Draft" value="draft-antony-esp-encrypted-ping-00"/>
+    <seriesInfo name="Internet-Draft"
+    value="draft-antony-esp-encrypted-ping-00" />
     <author initials="A." surname="Antony" fullname="Antony Antony">
       <organization abbrev="secunet">secunet Security Networks AG</organization>
       <address>
         <email>antony.antony@secunet.com</email>
       </address>
     </author>
-    <date year="2024"/>
+    <date year="2024" />
     <area>Internet</area>
     <workgroup>IP Security Maintenance and Extensions</workgroup>
     <keyword>IPsec</keyword>
     <keyword>esp</keyword>
     <abstract>
-      <t>
-This document defines an Encrypted ESP Echo Function, a novel
-mechanism designed to assess the reachability of a network path
-using Encapsulating Security Payload (ESP) packets. The primary
-objective of this function is to facilitate the detection of
-end-to-end path status dynamiclly in a reliable and efficient manner,
-only using encrypted ESP packets between the peers. It utilizes exitsting message payloads.
-</t>
+      <t>This document defines an Encrypted ESP Echo Function, a novel
+      mechanism designed to assess the reachability of an IPsec network path
+      using Encapsulating Security Payload (ESP) packets. The primary objective
+      of this function is to facilitate the detection of end-to-end path status
+      dynamiclly in a reliable and efficient manner, only using encrypted ESP
+      packets between the peers. The echo can use existing congestion control
+      payloads from
+      <xref target="RFC9347" />and also this document specifiy more
+      payloads, and specifically for bi-directional probing specifically requesting return path.</t>
     </abstract>
   </front>
   <middle>
     <section toc="default" anchor="Introduction">
-      <name> Introduction</name>
-      <t>
-   This document specifies a data-plane failure-detection
-   protocol for ESP, known as ESP Ping, that can also
-   specify an optional return paths for the echo reply message.
-   </t>
+      <name>Introduction</name>
+      <t>In response to the operational need for a robust data-plane
+      failure-detection mechanism for IP Security (IPsec) Encapsulating Security Payload
+      (ESP), this document introduces ESP Ping; Echo reqest and response. This
+      protocol offers a solution for assessing network path reachability and
+      can optionally specify a return path for echo reply messages.</t>
     </section>
     <section anchor="Requirements" toc="default">
-      <name> Requirements Language</name>
-      <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL",
-          "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT
-          RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
-          interpreted as described in BCP 14 <xref target="RFC2119"/>
-          <xref target="RFC8174"/> when, and only when, they appear in
-          all capitals, as shown here.</t>
+      <name>Requirements Language</name>
+      <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+      "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+      "OPTIONAL" in this document are to be interpreted as described in BCP 14
+      <xref target="RFC2119" />
+      <xref target="RFC8174" />when, and only when, they appear in all
+      capitals, as shown here.</t>
     </section>
     <section>
       <name>Problem statement</name>
-      <t>
-An IPsec session typically employs ESP in tunnel or transport mode, using IP or IPv6 packets
-with a Next Header value of 50. ESP parameters are negotiated using IKEv2, with
-default IKEv2 messages exchanged over UDP port 500. In scenarios where ESP
-packets are not encapsulated in UDP, successful IKE negotiation may occur, but
-ESP packets might fail to reach the peer due to differences in the packet path
-or filtering policies compared to IKE packets. Additionally, when using UDP
-encapsulation, ESP packets may encounter different filtering policies. Although
-this is less likely, it is still possible and can be hard to diagnose.
-Operational experience suggests that networks and some home routers that drop
-ESP packets are common enough to be a problem for general purpose VPN
-applications desiring to work reliably on the Internet.
-</t>
-      <t>
-The proposed ESP encrypted echo function aims to diagnose such situations. </t>
-      <t>
-Another situations are when there multiple SAs between the same peers some paths have filtering discrepancies , such as when using multiple SAs, as discussed in <xref target="I-D.ietf-ipsecme-multi-sa-performance"/>.
-</t>
+      <t>An IPsec session typically employs ESP in tunnel or transport mode,
+      using IP or IPv6 packets with a Next Header value of 50. ESP parameters
+      are negotiated using IKEv2, with default IKEv2 messages exchanged over
+      UDP port 500. In scenarios where ESP packets are not encapsulated in UDP,
+      successful IKE negotiation may occur, but ESP packets might fail to reach
+      the peer due to differences in the packet path or filtering policies
+      compared to IKE packets. Additionally, when using UDP encapsulation, ESP
+      packets may encounter different filtering policies. Although this is less
+      likely, it is still possible and can be hard to diagnose. Operational
+      experience suggests that networks and some home routers that drop ESP
+      packets are common enough to be a problem for general purpose VPN
+      applications desiring to work reliably on the Internet.</t>
+      <t>The proposed ESP encrypted echo function aims to diagnose such
+      situations.</t>
+      <t>Another situations are when there multiple SAs between the same peers
+      some paths have filtering discrepancies , such as when using multiple
+      SAs, as discussed in
+      <xref target="I-D.ietf-ipsecme-multi-sa-performance" />.</t>
       <section anchor="ReturnPath" numbered="true" toc="default">
         <name>Return path</name>
-        <t>
-  IPsec Security Associations (SAs) are negotiated as a pair, consisting of two
-  unidirectional SAs in one exchange. IKEv2 <xref target="RFC7296"/> Section 2.9
-  allows installing multiple Child SAs with identical Traffic Selectors. When
-  there are multiple paths, the ESP Echo should support requesting echo response
-  via a specific return path SA. To allow requesting a return path, additional
-  attribtues are necessary. The sender can propose a list of specific SPI for return path
-	in the preferred order.
- </t>
+        <t>IPsec Security Associations (SAs) are negotiated as a pair,
+        consisting of two unidirectional SAs in one exchange. IKEv2
+        <xref target="RFC7296" />Section 2.9 allows installing multiple Child
+        SAs with identical Traffic Selectors. When there are multiple paths,
+        the ESP Echo should support requesting echo response via a specific
+        return path SA. To allow requesting a return path, additional
+        attribtues are necessary. The sender can propose a list of specific SPI
+        for return path in the preferred order. The SPIs in the proposed list
+        must be present on the local system with same end point as the
+        destination. This is also necessary when the sender would like to probe
+        a path when there multiple possible paths present. E.g. If there is a
+        path over a sattelite link and over fiber. The receiving peer may have
+        a policy to respond via fiber path even when the request arrive via the
+        satteliate link. If the sender request a return path the receiver
+        SHOULD try to respond via that path, SA. However, the final decision is
+        upto the receiver. If the reciver still decides to send response</t>
       </section>
     </section>
     <section anchor="Protocol" numbered="true" toc="default">
       <name>Protocol Specification</name>
-      <t>After completing an IPsec SA negotiation, <xref target="RFC7296"/>, an IPsec peer wishing to verify the viability of the current network path for ESP packets MAY initiate an ESP Echo Request. The ESP Echo Request packet must be encrypted. If the SPIs are negotiated it SHOULD utilize an SPI value previously negotiated, e.g. negotiated through IKEv2.   </t>
-      <t> The sender sets the ESP Next Header value to AGGFRAG_PAYLOAD which has the value 144,
-	as specified in  <xref target="RFC9347"/>. This can be followed by different echo
-	request sub-type payloads with well defined format and empty data blocks following it.</t>
-      <t>The receiving IPsec peer, having established ESP through IKE, MAY respond to an ESP Echo Response. When replying to an encrypted ESP Echo Request, the ESP Echo Response MUST be encrypted and utilize the corresponding SPI. The receiver also sets the ESP Next Header value to AGGFRAG_PAYLOAD: 144, followed by the requested sub-type which can be:</t>
+      <t>After completing an IPsec SA negotiation,
+      <xref target="RFC7296" />, an IPsec peer wishing to verify the viability
+      of the current network path for ESP packets MAY initiate an ESP Echo
+      Request. The ESP Echo Request packet must be encrypted. If the SPIs are
+      negotiated it SHOULD utilize an SPI value previously negotiated, e.g.
+      negotiated through IKEv2.</t>
+      <t>The sender sets the ESP Next Header value to AGGFRAG_PAYLOAD which has
+      the value 144, as specified in
+      <xref target="RFC9347" />. This can be followed by different echo request
+      sub-type payloads with well defined format and empty data blocks
+      following it.</t>
+      <t>The receiving IPsec peer, having established ESP through IKE, MAY
+      respond to an ESP Echo Response. When replying to an encrypted ESP Echo
+      Request, the ESP Echo Response MUST be encrypted and utilize the
+      corresponding SPI. The receiver also sets the ESP Next Header value to
+      AGGFRAG_PAYLOAD: 144, followed by the requested sub-type which can
+      be:</t>
       <ul>
         <li>
-          <t> IP-TFS Congestion Control payload </t>
+          <t>IP-TFS Congestion Control AGGFRAG_PAYLOAD Payload Format as
+          specfied in
+          <xref target="RFC9347" />Section 6.1.2</t>
         </li>
         <li>
-          <t> ICMP  or ICMPv6 echo payload</t>
+          <t>Additional payloads to request specific return paths as a list.
+          MPLS has some examples of this</t>
         </li>
         <li>
-          <t>Additional payloads to request specific return paths as a list. </t>
-        </li>
-        <li>
-          <t>Additional payloads to request specific return paths as a list. </t>
-        </li>
-        <li>
-          <t> Dummy Data Blocks </t>
+          <t>Optional padding blocks. e.g if the IP-TFS poilcy is to use fixed
+          lenght packet pading would be ncessary.</t>
         </li>
       </ul>
+      <t>These playloads are not subject to IPsec Security Policy(SP),
+      typically negotiated using IKEv2 a nd manually configured. End padding
+      padding would be necessary of the the tunnel is always sending fixed size
+      ESP pa yload or possibly detect path anamoolies.</t>
       <section anchor="ICMP-Payload-Format" numbered="true" toc="default">
         <name>ICMP AGGFRAG_PAYLOAD Payload Format</name>
-        <t>
-		The ICMP payload format... just copied from Chris, we need to discuss
-		how it should look like.
-	</t>
-
-
-
-
-
-          <figure anchor="icmp-payload-format" align="left" suppress-title="false" >
-            <name slugifiedName="name-icmp-payload-">ICMP Payload Format</name>
-            <artwork name="" type="" align="left" alt="" >
-                      1                   2                   3
-  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
- +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- |  Sub-type (2) |  Reserved |P|E|          BlockOffset          |
- +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- |                          LossEventRate                        |
- +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- |                      RTT                  |   Echo Delay ...
- +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-      ... Echo Delay   |           Transmit Delay                |
- +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- |                              TVal                             |
- +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- |                             TEcho                             |
- +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- |       DataBlocks ...
- +-+-+-+-+-+-+-+-+-+-+-
-</artwork>
-          </figure>
-
-
-
-
-
-
-
+        <t>The ICMP payload format... just copied from Chris, we need to
+        discuss how it should look like.</t>
+        <figure anchor="icmp-payload-format" align="left"
+        suppress-title="false">
+          <name slugifiedName="name-icmp-payload-">ICMP Payload Format</name>
+          <artwork name="" type="" align="left" alt="">1 2 3 0 1 2 3 4 5 6 7 8
+          9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+          +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ |
+          Sub-type (2) | Reserved |P|E| BlockOffset |
+          +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ |
+          TVal |
+          +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ |
+          TEcho |
+          +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ |
+          Empty DataBlocks ... +-+-+-+-+-+-+-+-+-+-+-</artwork>
+        </figure>
       </section>
-
     </section>
     <section anchor="Security" numbered="true" toc="default">
       <!-- All drafts are required to have a security considerations section. See RFC 3552 for a guide. -->
       <name>Security Considerations</name>
-      <t>The security considerations are similar to other unconnected request-reply protocols such as ICMP or ICMPv6 echo. The prosoed echo and respons does not constitute an amplification attack because the ESP Echo Reply is atmost same size as the ESP Echo Request. Further this can be rate limited or fitlered using  ingress filtering per BCP 38 <xref target="RFC2827"/></t>
+      <t>The security considerations are similar to other unconnected
+      request-reply protocols such as ICMP or ICMPv6 echo. The proposed ESP echo and
+      response does not constitute an amplification attack because the ESP Echo
+      Reply is atmost same size as the ESP Echo Request. Further this can be
+      rate limited or fitlered using ingress filtering per BCP 38
+      <xref target="RFC2827" /></t>
     </section>
     <section anchor="IANA">
       <!-- All drafts are required to have an IANA considerations section. See RFC 8126 for a guide.-->
       <name>IANA Considerations</name>
-      <t>
-			Updates <xref target="RFC9347"/> to be allowed in in ESP without
-			</t>
+      <t>Updates
+      <xref target="RFC9347" />to be allowed in in ESP without</t>
     </section>
     <section anchor="Operations" toc="default">
-      <name> Operational Considerations</name>
-      <t>
-When an explicit return path is requested and the responder's local policies do not allow that how do we deal with it?
-</t>
+      <name>Operational Considerations</name>
+      <t>When an explicit return path is requested and the responder's local
+      policies do not allow that how do we deal with it?</t>
+      <t>A typlical implementation would be a ESP Echo socket. And the socket
+      would allow to set outgoing SPI at creation, optionally matching source
+      and destination address. Once this set before sending any data.
+      Userspcace can only write payload into AGGFRAG_PAYLOAD</t>
     </section>
   </middle>
   <back>
@@ -179,12 +189,12 @@ When an explicit return path is requested and the responder's local policies do 
       <name>References</name>
       <references>
         <name>Normative References</name>
-        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.2827.xml"/>
-        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.2119.xml"/>
-        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.8174.xml"/>
-        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.7296.xml"/>
-        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.9347.xml"/>
-        <xi:include href="https://datatracker.ietf.org/doc/bibxml3/draft-ietf-ipsecme-multi-sa-performance.xml"/>
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.2827.xml" />
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.2119.xml" />
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.8174.xml" />
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.7296.xml" />
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.9347.xml" />
+        <xi:include href="https://datatracker.ietf.org/doc/bibxml3/draft-ietf-ipsecme-multi-sa-performance.xml" />
         <!-- The recommended and simplest way to include a well known reference -->
       </references>
       <references>
@@ -193,7 +203,7 @@ When an explicit return path is requested and the responder's local policies do 
     </references>
     <section anchor="Acknowledgements" numbered="false">
       <name>Acknowledgements</name>
-      <t> ACKs TBD </t>
+      <t>ACKs TBD</t>
     </section>
   </back>
 </rfc>
