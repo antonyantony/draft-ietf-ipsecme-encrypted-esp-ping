@@ -184,13 +184,24 @@ obsoletes="" submissionType="IETF" xml:lang="en" version="3">
         </li>
         <li>
           <t>Optional padding blocks. e.g if the IP-TFS poilcy is to use fixed
-          lenght packet pading would be ncessary.</t>
+          length packet pading would be ncessary.</t>
         </li>
       </ul>
       <t>These playloads are not subject to IPsec Security Policy(SP),
       typically negotiated using IKEv2 a nd manually configured. End padding
       padding would be necessary of the the tunnel is always sending fixed size
       ESP pa yload or possibly detect path anamoolies.</t>
+<t>
+  Do not take the lack of a response alone as an indication of the unreachability of the
+  return path when probing using ESP echo; also consider the received bytes on the return path.
+	IPsec has a unique advantage over other tunneling protocols when the return path shows incoming bytes,
+  indicating that the path is partially functional. This is especially useful when used
+  as a liveness check on busy paths. When there is no response, instead of concluding
+  that the path is not viable and taking action, such as tearing down the IPsec connection,
+	read the incoming bytes. This would
+  help avoid tearing down busy paths due to the lack of an ESP echo response.
+</t>
+
       <section anchor="ICMP-Payload-Format" numbered="true" toc="default">
         <name>ICMP AGGFRAG_PAYLOAD Payload Format</name>
         <t>The ICMP payload format... just copied from Chris, we need to
