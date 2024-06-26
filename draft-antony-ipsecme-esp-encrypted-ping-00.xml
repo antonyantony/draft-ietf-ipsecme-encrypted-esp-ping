@@ -26,7 +26,7 @@ obsoletes="" submissionType="IETF" xml:lang="en" version="3">
         <email>antony.antony@secunet.com</email>
       </address>
     </author>
-		<author fullname="Steffen Klassert" initials="S." surname="Klassert">
+    <author fullname="Steffen Klassert" initials="S." surname="Klassert">
       <organization abbrev="secunet">secunet Security Networks
       AG</organization>
       <address>
@@ -198,47 +198,48 @@ obsoletes="" submissionType="IETF" xml:lang="en" version="3">
       typically negotiated using IKEv2 a nd manually configured. End padding
       padding would be necessary of the the tunnel is always sending fixed size
       ESP pa yload or possibly detect path anamoolies.</t>
-<t>
-  When probing do not take the lack of a response alone as an indication of the unreachability of the
-  return path when probing using ESP echo; also consider the received bytes on the return path.
-	IPsec has a unique advantage over other tunneling protocols when the return path shows incoming bytes,
-  indicating that the path is partially functional. This is especially useful when used
-  as a liveness check on busy paths. When there is no response, instead of concluding
-  that the path is not viable and taking action, such as tearing down the IPsec connection,
-	read the incoming bytes. This would
-  help avoid tearing down busy paths due to the lack of an ESP echo response.
-</t>
+      <t>When probing do not take the lack of a response alone as an indication
+      of the unreachability of the return path when probing using ESP echo;
+      also consider the received bytes on the return path. IPsec has a unique
+      advantage over other tunneling protocols when the return path shows
+      incoming bytes, indicating that the path is partially functional. This is
+      especially useful when used as a liveness check on busy paths. When there
+      is no response, instead of concluding that the path is not viable and
+      taking action, such as tearing down the IPsec connection, read the
+      incoming bytes. This would help avoid tearing down busy paths due to the
+      lack of an ESP echo response.</t>
       <section anchor="ESP-Echo-Format" numbered="true" toc="default">
         <name>ESP Echo Payload Format</name>
         <figure anchor="echo-echo-payload" align="left" suppress-title="false">
-            <name slugifiedName="name-congestion-control-payload-">Congestion Control Payload Format</name>
-            <artwork name="" type="" align="left" alt="" pn="section-6.1.2-2.1">
-                      1                   2                   3
-  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
- +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- |  Sub-type     |                   |  Data Length              |
- +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- | Identifier (ID)                  | Sequence Number            |
- +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- | Reutrn path SPI                                               |
- +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-
- |       Data  ...
- +-+-+-+-+-+-+-+-+-+-+-
-</artwork>
-          </figure>
-					<ul>
-          <li> Sub-Type:  2 for request and 3 for response</li>
-          <li> Reserved:  7 bits</li>
-          <li> Return path:  1 bit flag</li>
-					<li> Data Length : number of zerors follwing. Len 24 bits</li>
-					<li> Identifier : A 16-bit request identifier. The identifier might be set to a unique value to distinguish between different ping sessions. Response copy it from the request</li>
-					<li> Sequence number: A 16-bit field that increments with each echo request sent. </li>
-					<li> Returun path: optional requested retrun path SPI. </li>
-					<li> Data : Optional data that follows the Echo request. </li>
-					</ul>
+          <name slugifiedName="name-congestion-control-payload-">Congestion
+          Control Payload Format</name>
+          <artwork name="" type="" align="left" alt="">
+                    1                   2                   3
+0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|Sub-type (2)   | Reserved    |R|Data Length                    |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|Identifier (ID)|Sequence Number                                |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+| Reutrn path SPI                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+| Data ...
++-+-+-+-+-+-+-+-+-+-+-</artwork>
+        </figure>
+        <ul>
+          <li>Sub-Type: 2 for request and 3 for response</li>
+          <li>Reserved: 7 bits</li>
+          <li>Return path: 1 bit flag</li>
+          <li>Data Length : number of data octets follwing, length 16 bits</li>
+          <li>Identifier : A 16-bit request identifier. The identifier might be
+          set to a unique value to distinguish between different ping sessions.
+          Response copy it from the request</li>
+          <li>Sequence number: A 16-bit field that increments with each echo
+          request sent.</li>
+          <li>Returun path: optional requested retrun path SPI.</li>
+          <li>Data : Optional data that follows the Echo request.</li>
+        </ul>
       </section>
-
     </section>
     <section anchor="Security" numbered="true" toc="default">
       <!-- All drafts are required to have a security considerations section. See RFC 3552 for a guide. -->
@@ -258,8 +259,9 @@ obsoletes="" submissionType="IETF" xml:lang="en" version="3">
     </section>
     <section anchor="Operations" toc="default">
       <name>Operational Considerations</name>
-      <t>When an explicit return path is requested and the responder's should try
-			to respond via this path, however, if local policies do not allow this respond via another SA. ?</t>
+      <t>When an explicit return path is requested and the responder's should
+      try to respond via this path, however, if local policies do not allow
+      this respond via another SA. ?</t>
       <t>A typlical implementation would be a ESP Echo socket. And the socket
       would allow to set outgoing SPI at creation, optionally matching source
       and destination address. Once this set before sending any data.
