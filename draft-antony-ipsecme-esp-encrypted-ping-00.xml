@@ -162,7 +162,7 @@ obsoletes="" submissionType="IETF" xml:lang="en" version="3">
     </section>
     <section anchor="Protocol" numbered="true" toc="default">
       <name>Protocol Specification</name>
-      <t>After completing an IPsec SA negotiation,
+      <t>In a typical use case, after completing an IPsec SA negotiation,
       <xref target="RFC7296" />, an IPsec peer wishing to verify the viability
       of the current network path for ESP packets MAY initiate an ESP Echo
       Request. The ESP Echo Request packet must be encrypted. If the SPIs are
@@ -183,7 +183,7 @@ obsoletes="" submissionType="IETF" xml:lang="en" version="3">
         <li>
           <t>IP-TFS Congestion Control AGGFRAG_PAYLOAD Payload Format as
           specfied in
-          <xref target="RFC9347" />Section 6.1.2</t>
+          <xref target="RFC9347" />Section 6.1.2 can be used for echo request and response</t>
         </li>
         <li>
           <t>Additional payloads to request specific return paths as a list.
