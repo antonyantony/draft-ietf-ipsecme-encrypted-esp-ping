@@ -59,6 +59,10 @@ obsoletes="" submissionType="IETF" xml:lang="en" version="3">
       and response. This protocol offers a solution for assessing network path
       reachability and can optionally specify a return path for echo reply
       messages.</t>
+      <t>This document covers only authenticated ESP Ping, while
+         <xref target="I-D.colitti-ipsecme-esp-ping"/> specifies an
+         unauthenticated ESP ping.
+      </t>
       <section numbered="true" toc="default">
         <name>Terminology</name>
         <t>This document uses the following terms defined in IKEv2
@@ -66,6 +70,8 @@ obsoletes="" submissionType="IETF" xml:lang="en" version="3">
         Security Association (SA), Security Policy Database (SPD).</t>
         <t>This document uses the following terms defined in IKEv2
         <xref target="RFC9347"/>: constant rate on the AGGFRAG tunnel.</t>
+        <t>This document uses the following terms defined in
+        <xref target="RFC7110"/>: Return Path Specified LSP Ping </t>
       </section>
     </section>
     <section anchor="Requirements" toc="default">
@@ -85,7 +91,7 @@ obsoletes="" submissionType="IETF" xml:lang="en" version="3">
       <section anchor="Usecases" numbered="true" toc="default">
         <name>ESP Blocked or Filtered</name>
         <t>An IPsec session typically employs ESP,
-        using IP or IPv6 packets with a Next Header value of 50. ESP parameters
+        using IP or IPv6 packets. ESP parameters
         are negotiated using IKEv2, with default IKEv2 messages exchanged over
         UDP port 500. In scenarios where ESP packets are not encapsulated in
         UDP, successful IKE negotiation may occur, but ESP packets might fail
@@ -126,9 +132,10 @@ obsoletes="" submissionType="IETF" xml:lang="en" version="3">
         peer may have a policy to respond via the fiber path even when the
         request arrives via the satellite link. If the sender requests a return
         path, the receiver SHOULD try to respond via that path, SA. However,
-        the final decision is up to the receiver. If the receiver still decides
-        to send the response via a different path, it SHOULD clearly indicate
-        the chosen path in the response.</t>
+        the final decision is up to the receiver. When the receiver
+        to send the response via a different path than the requested return
+        path, the sender would notice the chosen path in the response.An example
+        is Return Path Specified LSP ping specified <xref target="RFC7110"/> </t>
       </section>
       <section anchor="IPTFS-Band-Width" numbered="true" toc="default">
         <name>Manually Probing a Constant Rate on the AGGFRAG Tunnel</name>
@@ -179,8 +186,9 @@ obsoletes="" submissionType="IETF" xml:lang="en" version="3">
       corresponding SPI. The receiver also sets the ESP Next Header value to
       AGGFRAG_PAYLOAD: 144, followed by the requested sub-type</t>
 			<t>
-			AGGFRAG_PAYLOAD Payload starts from ESP Next Header value: 144 and followed one of the Echo Request payloads.
+			AGGFRAG_PAYLOAD Payload starts from ESP Next Header value: 144 and followed one of the two Request payloads specified.
 			</t>
+
 			<section anchor="Congestion_Control" numbered="true" toc="default">
         <name>Using Congestion Control Payload</name>
 
@@ -295,6 +303,7 @@ obsoletes="" submissionType="IETF" xml:lang="en" version="3">
         <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.7296.xml"/>
         <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.9347.xml"/>
         <xi:include href="https://datatracker.ietf.org/doc/bibxml3/draft-ietf-ipsecme-multi-sa-performance.xml"/>
+        <xi:include href="https://datatracker.ietf.org/doc/bibxml3/draft-colitti-ipsecme-esp-ping.xml"/>
 				<reference anchor="AGGFRAG"
       target="https://www.iana.org/assignments/esp-aggfrag-payload/esp-aggfrag-payload.xhtml"
       quoteTitle="true">
@@ -308,6 +317,7 @@ obsoletes="" submissionType="IETF" xml:lang="en" version="3">
       </references>
       <references>
         <name>Informative References</name>
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.7110.xml"/>
       </references>
     </references>
     <section anchor="Acknowledgements" numbered="false">
