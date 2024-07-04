@@ -55,13 +55,13 @@ obsoletes="" submissionType="IETF" xml:lang="en" version="3">
       <name>Introduction</name>
       <t>In response to the operational need for a robust data-plane
       failure-detection mechanism for IP Security (IPsec) Encapsulating
-      Security Payload (ESP), this document introduces ESP Ping; Echo request
+      Security Payload (ESP), this document introduces Encrypted ESP Ping; Echo request
       and response. This protocol offers a solution for assessing network path
       reachability and can optionally specify a return path for echo reply
       messages.</t>
-      <t>This document covers only authenticated ESP Ping, while
-         <xref target="I-D.colitti-ipsecme-esp-ping"/> specifies an
-         unauthenticated ESP ping.
+      <t>This document covers only Encrypted ESP Ping, while
+      <xref target="I-D.colitti-ipsecme-esp-ping"/> specifies an
+         unauthenticated ESP Ping.
       </t>
       <section numbered="true" toc="default">
         <name>Terminology</name>
@@ -86,23 +86,27 @@ obsoletes="" submissionType="IETF" xml:lang="en" version="3">
     <section>
       <name>Use cases</name>
       <t>Diagnosing operational problems in IPsec can be challenging. The
-      proposed ESP encrypted echo function aims to address these challenges and
+      proposed Encrypted ESP echo function aims to address these challenges and
       provide a reliable diagnostic tool.</t>
       <section anchor="Usecases" numbered="true" toc="default">
         <name>ESP Blocked or Filtered</name>
-        <t>An IPsec session typically employs ESP,
-        using IP or IPv6 packets. ESP parameters
-        are negotiated using IKEv2, with default IKEv2 messages exchanged over
-        UDP port 500. In scenarios where ESP packets are not encapsulated in
-        UDP, successful IKE negotiation may occur, but ESP packets might fail
-        to reach the peer due to differences in the packet path or filtering
-        policies compared to IKE packets. Additionally, when not using UDP
-        encapsulation, ESP packets may encounter different filtering policies.
-        Although this is less likely, it is still possible and can be hard to
-        diagnose. Operational experience suggests that networks and some home
-        routers that drop ESP packets are common enough to be a problem for
-        general-purpose VPN applications desiring to work reliably on the
-        Internet.</t>
+      <t>
+        An IPsec session typically employs ESP, using IP or IPv6 packets. ESP
+        parameters are negotiated using IKEv2, with default IKEv2 messages
+        exchanged over UDP port 500.  In scenarios where ESP packets are not
+        encapsulated in UDP, i.e using protocol ESP, successful IKE negotiation
+        may occur, but ESP packets might fail to reach the peer due to
+        differences in the packet path or filtering policies compared to IKE
+        packets (e.g., UDP is allowed while ESP is filtered, typically a
+        misconfiguration). Additionally, when using UDP encapsulation, ESP
+        packets may encounter different filtering policies. This is typically
+        due to broken packet filtering. Although this is less likely, it is still
+        possible and can be hard to diagnose. Operational experience suggests
+        that networks and some home routers that drop ESP packets are common
+        enough to be a problem for general-purpose VPN applications desiring to
+        work reliably on the Internet. Encrypted ESP Ping would be a great help
+        to diagnose these scenarios.
+       </t>
       </section>
       <section anchor="Probe-MultiPath" numbered="true" toc="default">
         <name>Probing Multiple Paths</name>
@@ -114,40 +118,40 @@ obsoletes="" submissionType="IETF" xml:lang="en" version="3">
         from an IPsec peer. Each SA may traverse different network paths and
         may have different policies. The ESP Encrypted Ping would specifically
         help determine the reachability of each path independently.</t>
-      </section>
+			 </section>
       <section anchor="ReturnPath" numbered="true" toc="default">
-        <name>Probe Return Path</name>
-        <t>IPsec Security Associations (SAs) are negotiated as a pair,
-        consisting of two unidirectional SAs in one exchange. IKEv2
-        <xref target="RFC7296"/>Section 2.9 allows installing multiple Child
-        SAs with identical Traffic Selectors. When there are multiple paths,
-        the ESP Echo should support requesting an echo response via a specific
-        return path SA. To allow requesting a return path, additional
-        attributes are necessary. The sender can propose a list of specific SPI
-        for return paths in the preferred order. The SPIs in the proposed list
-        must be present on the local system with the same endpoint as the
-        destination. This is also necessary when the sender would like to probe
-        a path when there are multiple possible paths present. For example, if
-        there is a path over a satellite link and over fiber, the receiving
-        peer may have a policy to respond via the fiber path even when the
-        request arrives via the satellite link. If the sender requests a return
-        path, the receiver SHOULD try to respond via that path, SA. However,
-        the final decision is up to the receiver. When the receiver
-        to send the response via a different path than the requested return
-        path, the sender would notice the chosen path in the response.An example
-        is Return Path Specified LSP ping specified <xref target="RFC7110"/> </t>
-      </section>
-      <section anchor="IPTFS-Band-Width" numbered="true" toc="default">
+       <name>Probe Return Path</name>
+        <t>
+    IPsec Security Associations (SAs) are negotiated as a pair, consisting of two
+    unidirectional SAs in one exchange. IKEv2 <xref target="RFC7296"/> Section 2.9 allows
+    installing multiple Child SAs with identical Traffic Selectors. When there are multiple
+    paths, the Encrypte ESP Ping should support requesting an echo response via
+    a specific return path IPsec SA. To request a return path, additional
+    attributes are necessary. The sender proposes a specific SPI as the
+    preferred return path. The proposed return path SPI MUST be
+    present on the local system with the same endpoint as the destination. A specific return
+    path is necessary when the sender would like to probe a path, and there are multiple
+    possible paths present. For example, if there is a path over a satellite link and over
+    fiber, the receiving peer may have a policy to respond via the fiber path even when the
+    request arrives via the satellite link. If the sender requests a return path, the receiver
+    SHOULD try to respond via that path, IPsec SA. However, the final decision is up to the
+    receiver. If the receiver decides to send the response via a different path than the
+    requested return path, the sender would notice the chosen path in the response. An example
+    is Return Path Specified LSP ping specified in <xref target="RFC7110"/>.
+       </t>
+     </section>
+     <section anchor="IPTFS-Band-Width" numbered="true" toc="default">
         <name>Manually Probing a Constant Rate on the AGGFRAG Tunnel</name>
         <t>In IPsec setups, maintaining a constant traffic rate can help in
         disguising actual traffic patterns, providing enhanced security. The
         AGGFRAG tunnel enables constant rate probing to ensure consistent
         bandwidth usage, helping to mitigate the risk of traffic analysis by
-        adversaries. This approach is particularly useful in scenarios where
-        maintaining a uniform traffic pattern is critical for security.</t>
+        adversaries. This approach is particularly useful to discover possible
+        bandwidth where maintaining a uniform traffic pattern is critical
+        for security, using IP-TFS.</t>
       </section>
       <section anchor="WhyNotIP" numbered="true" toc="default">
-        <name>Why Not Use Existing IP Tools?</name>
+        <name>Why Not Use Existing IP Tools</name>
         <t>Existing tools such as ICMP ping or traceroute assume IP
         connectivity. However, in IPsec gateway setups, the gateway itself may
         not have an IP address that matches the IPsec Security Policy Database
@@ -155,7 +159,7 @@ obsoletes="" submissionType="IETF" xml:lang="en" version="3">
         SPD.</t>
         <t>Additionally, in the case of multiple SAs as mentioned above, IP
         tools would find it hard, if not impossible, to generate IP traffic to
-        explore multiple paths specifically.</t>
+        explore multiple paths specifically</t>
       </section>
       <section anchor="ReceivedTraffic" numbered="true" toc="default">
         <name>Also Track Incoming Traffic</name>
@@ -199,13 +203,13 @@ obsoletes="" submissionType="IETF" xml:lang="en" version="3">
   successfully negotiated. This this request does not support requesting a specific
   return path.
         </t>
-       <t> [AA when using USE_AGGFRAG tunnel is negotatied, responder may concatinate AGGFRAG_PAYLOAD Congestion control probe]
+       <t> [AA when using USE_AGGFRAG tunnel is negotiated, responder may concatenate AGGFRAG_PAYLOAD Congestion control probe]
        </t>
 
       <t>The Echo request and response payloads are not subject to IPsec Security Policy(SP),
       typically negotiated using IKEv2 a nd manually configured. End padding
       padding would be necessary of the the tunnel is always sending fixed size
-      ESP payload or possibly detect path anamoolies.</t>
+      ESP payload or possibly detect path anomalies.</t>
 
       <t>When probing do not take the lack of a response alone as an indication
       of the unreachability of the return path using ESP echo;
@@ -219,7 +223,7 @@ obsoletes="" submissionType="IETF" xml:lang="en" version="3">
       missing ESP echo response.</t>
 			</section>
       <section anchor="ESP-Echo-Format" numbered="true" toc="default">
-        <name>ESP Ping Payload Format</name>
+        <name>Encrypted ESP Ping Payload Format</name>
         <figure anchor="echo-echo-payload" align="left" suppress-title="false">
           <name slugifiedName="name-congestion-control-payload-">Congestion
           Control Payload Format</name>
