@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
+<rfc xmlns:xi="http://www.w3.org/2001/XInclude" category="std"
+docName="draft-antony-ipsecme-encrypted-esp-ping-00" ipr="trust200902"
+obsoletes="" updates="" submissionType="IETF" xml:lang="en" tocInclude="true"
+version="3" consensus="true">
+  <front>
+    <title abbrev="Encrypted Esp Ping">ESP Encrypted Echo Protocol</title>
+    <seriesInfo name="Internet-Draft"
+    value="draft-antony-ipsecme-encrypted-esp-ping-00"/>
+    <author initials="A." surname="Antony" fullname="Antony Antony">
+      <organization abbrev="secunet">secunet Security Networks AG</organization>
+      <address>
+        <email>antony.antony@secunet.com</email>
+      </address>
+    </author>
+    <author fullname="Steffen Klassert" initials="S." surname="Klassert">
+      <organization abbrev="secunet">secunet Security Networks AG</organization>
+      <address>
+        <email>steffen.klassert@secunet.com</email>
+      </address>
+    </author>
+    <date year="2024"/>
+    <area>Internet</area>
+    <workgroup>IP Security Maintenance and Extensions</workgroup>
+    <keyword>IPsec</keyword>
+    <keyword>ESP</keyword>
+    <keyword>Ping</keyword>
+    <abstract>
+      <t> This document defines an Encrypted ESP Echo Function, a novel
+  mechanism designed to assess the reachability of an IP Security (IPsec)
+  network path using Encapsulating Security Payload (ESP) packets. The
+  primary objective of this function is to facilitate the detection of
+  end-to-end path status dynamically in a reliable and efficient manner,
+  only using encrypted ESP packets between the IPsec peers. The Encrypted
+  Echo message can use existing congestion control payloads from RFC9347
+  or the message format specified here, with an optional preferred return
+  path</t>
+    </abstract>
+  </front>
+  <middle>
+    <section toc="default" anchor="Introduction">
+      <name>Introduction</name>
+      <t>In response to the operational need for a robust data-plane
+      failure-detection mechanism for IP Security (IPsec) Encapsulating
+      Security Payload (ESP), this document introduces Encrypted ESP Ping; Echo request
+      and response. This protocol offers a solution for assessing network path
+      reachability and can optionally specify a return path for echo reply
+      messages.</t>
+      <t>This document covers only Encrypted ESP Ping, while
+      <xref target="I-D.colitti-ipsecme-esp-ping"/> specifies an
+         unauthenticated ESP Ping.
+      </t>
+      <section numbered="true" toc="default">
+        <name>Terminology</name>
+        <t>This document uses the following terms defined in IKEv2
+        <xref target="RFC4301"/>: Encapsulating Security Payload (ESP),
+        Security Association (SA), Security Policy Database (SPD).</t>
+        <t>This document uses the following terms defined in IKEv2
+        <xref target="RFC9347"/>: constant rate on the AGGFRAG tunnel.</t>
+        <t>This document uses the following terms defined in
+        <xref target="RFC7110"/>: Return Path Specified LSP Ping </t>
+      </section>
+    </section>
+    <section anchor="Requirements" toc="default">
+      <name>Requirements Language</name>
+      <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+      "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+      "OPTIONAL" in this document are to be interpreted as described in BCP 14
+      <xref target="RFC2119"/>
+      <xref target="RFC8174"/>when, and only when, they appear in all
+      capitals, as shown here.</t>
+    </section>
+    <section>
+      <name>Use cases</name>
+      <t>Diagnosing operational problems in IPsec can be challenging. The
+      proposed Encrypted ESP echo function aims to address these challenges and
+      provide a reliable diagnostic tool.</t>
+      <section anchor="Usecases" numbered="true" toc="default">
+        <name>ESP Blocked or Filtered</name>
+      <t>
+        An IPsec session typically employs ESP, using IP or IPv6 packets. ESP
+        parameters are negotiated using IKEv2, with default IKEv2 messages
+        exchanged over UDP port 500.  In scenarios where ESP packets are not
+        encapsulated in UDP, i.e using protocol ESP, successful IKE negotiation
+        may occur, but ESP packets might fail to reach the peer due to
+        differences in the packet path or filtering policies compared to IKE
+        packets (e.g., UDP is allowed while ESP is filtered, typically a
+        misconfiguration). Additionally, when using UDP encapsulation, ESP
+        packets may encounter different filtering policies. This is typically
+        due to broken packet filtering. Although this is less likely, it is still
+        possible and can be hard to diagnose. Operational experience suggests
+        that networks and some home routers that drop ESP packets are common
+        enough to be a problem for general-purpose VPN applications desiring to
+        work reliably on the Internet. Encrypted ESP Ping would be a great help
+        to diagnose these scenarios.
+       </t>
+      </section>
+      <section anchor="Probe-MultiPath" numbered="true" toc="default">
+        <name>Probing Multiple Paths</name>
+        <t>When there are multiple paths created using multiple Child SAs with
+        identical Traffic Selectors as specified in
+        <xref target="RFC7296"/>or more explicitly in
+        <xref target="I-D.ietf-ipsecme-multi-sa-performance"/>, there is a
+        need to probe each Child SA, including the network path, independently
+        from an IPsec peer. Each SA may traverse different network paths and
+        may have different policies. The ESP Encrypted Ping would specifically
+        help determine the reachability of each path independently.</t>
+			 </section>
+      <section anchor="ReturnPath" numbered="true" toc="default">
+       <name>Probe Return Path</name>
+        <t>
+    IPsec Security Associations (SAs) are negotiated as a pair, consisting of two
+    unidirectional SAs in one exchange. IKEv2 <xref target="RFC7296"/> Section 2.9 allows
+    installing multiple Child SAs with identical Traffic Selectors. When there are multiple
+    paths, the Encrypte ESP Ping should support requesting an echo response via
+    a specific return path IPsec SA. To request a return path, additional
+    attributes are necessary. The sender proposes a specific SPI as the
+    preferred return path. The proposed return path SPI MUST be
+    present on the local system with the same endpoint as the destination. A specific return
+    path is necessary when the sender would like to probe a path, and there are multiple
+    possible paths present. For example, if there is a path over a satellite link and over
+    fiber, the receiving peer may have a policy to respond via the fiber path even when the
+    request arrives via the satellite link. If the sender requests a return path, the receiver
+    SHOULD try to respond via that path, IPsec SA. However, the final decision is up to the
+    receiver. If the receiver decides to send the response via a different path than the
+    requested return path, the sender would notice the chosen path in the response. An example
+    is Return Path Specified LSP ping specified in <xref target="RFC7110"/>.
+       </t>
+     </section>
+     <section anchor="IPTFS-Band-Width" numbered="true" toc="default">
+        <name>Manually Probing a Constant Rate on the AGGFRAG Tunnel</name>
+        <t>In IPsec setups, maintaining a constant traffic rate can help in
+        disguising actual traffic patterns, providing enhanced security. The
+        AGGFRAG tunnel enables constant rate probing to ensure consistent
+        bandwidth usage, helping to mitigate the risk of traffic analysis by
+        adversaries. This approach is particularly useful to discover possible
+        bandwidth where maintaining a uniform traffic pattern is critical
+        for security, using IP-TFS.</t>
+      </section>
+      <section anchor="WhyNotIP" numbered="true" toc="default">
+        <name>Why Not Use Existing IP Tools</name>
+        <t>Existing tools such as ICMP ping or traceroute assume IP
+        connectivity. However, in IPsec gateway setups, the gateway itself may
+        not have an IP address that matches the IPsec Security Policy Database
+        (SPD). Due to this, ESP messages must be used without relying on the
+        SPD.</t>
+        <t>Additionally, in the case of multiple SAs as mentioned above, IP
+        tools would find it hard, if not impossible, to generate IP traffic to
+        explore multiple paths specifically</t>
+      </section>
+      <section anchor="ReceivedTraffic" numbered="true" toc="default">
+        <name>Also Track Incoming Traffic for livenss check</name>
+        <t> In addition to probing the outgoing paths, it is essential to monitor and
+  account for the incoming traffic to ensure comprehensive network
+  visibility of IPsec. Incoming SA traffic counters are unique to IPsec
+  compared to other tunneling or native IP connections. In IPsec, the
+  incoming counters reliably indicate a viable path. This should be taken
+  into account when probing IPsec paths. For example, when the crypto
+  subsystem is overloaded, the responder may miss out on Encrypted ESP
+  Ping responses. However, tracking the incoming traffic after the ping
+  probe is sent would help applications to recognize the IPsec path is
+  still viable.
+        </t>
+      </section>
+    </section>
+    <section anchor="Protocol" numbered="true" toc="default">
+      <name>Protocol Specification</name>
+      <t>In a typical use case, after completing an IPsec SA negotiation,
+      <xref target="RFC7296"/>, an IPsec peer wishing to verify the viability
+      of the current network path for ESP packets MAY initiate an ESP Echo
+      Request. The ESP Echo Request packet must be encrypted. If the SPIs are
+      negotiated it SHOULD utilize an SPI value previously negotiated, e.g.
+      negotiated through IKEv2.</t>
+      <t>The sender sets the ESP Next Header value to AGGFRAG_PAYLOAD which has
+      the value 144, as specified in
+      <xref target="RFC9347"/>. This can be followed by different echo request
+      sub-type payloads with a well defined format and optional empty data blocks
+      following it.</t>
+      <t>The receiving IPsec peer, having established ESP through IKE, MAY
+      respond to an ESP Echo Response. When replying to an encrypted ESP Echo
+      Request, the ESP Echo Response MUST be encrypted and utilize the
+      corresponding SPI. The receiver also sets the ESP Next Header value to
+      AGGFRAG_PAYLOAD: 144, followed by the requested sub-type</t>
+      <t>
+      AGGFRAG_PAYLOAD Payload starts from ESP Next Header value: 144 and followed one of the two Request payloads specified.
+      </t>
+
+      <section anchor="Congestion_Control" numbered="true" toc="default">
+        <name>Using Congestion Control Payload</name>
+
+        <t>IP-TFS Congestion Control AGGFRAG_PAYLOAD Payload Format as specified in
+  <xref target="RFC9347"/> Section 6.1.2 can be used for Echo Request and
+  response. When using this payload for Echo Request and response, IPv4 or IPv6 Data Block
+  MUST NOT be concatenated, especially when USE_AGGFRAG is not
+  successfully negotiated. This this request does not support requesting a specific
+  return path.
+        </t>
+       <t> [AA when using USE_AGGFRAG tunnel is negotiated, responder may concatenate AGGFRAG_PAYLOAD Congestion control probe]
+       </t>
+
+      <t>The Echo request and response payloads are not subject to IPsec Security Policy(SP),
+      typically negotiated using IKEv2 a nd manually configured. End padding
+      padding would be necessary of the the tunnel is always sending fixed size
+      ESP payload or possibly detect path anomalies.</t>
+
+      <t>When probing do not take the lack of a response alone as an indication
+      of the unreachability of the return path using ESP echo;
+      also consider the received bytes on the return path. IPsec has a unique
+      advantage over other tunneling protocols when the return path shows
+      incoming bytes, indicating that the path is partially functional. This is
+      especially useful when used as a liveness check on busy paths. When there
+      is no response, instead of concluding that the path is not viable and
+      taking action, such as tearing down the IPsec connection, read the
+      incoming bytes. This would help avoid tearing down busy paths due to the
+      missing ESP echo response.</t>
+      </section>
+      <section anchor="ESP-Echo-Format" numbered="true" toc="default">
+        <name>Encrypted ESP Ping Payload Format</name>
+        <figure anchor="echo-echo-payload" align="left" suppress-title="false">
+          <name slugifiedName="name-congestion-control-payload-">Congestion
+          Control Payload Format</name>
+          <artwork name="" type="" align="left" alt="">
+                    1                   2                   3
+0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|Sub-type (2)   | Reserved    |R|Data Length                    |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|Identifier (ID)|Sequence Number                                |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+| Return path SPI                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+| Data ...
++-+-+-+-+-+-+-+-+-+-+-</artwork>
+        </figure>
+        <ul>
+          <li>Sub-Type: ESP-ECHO-REQUEST or ESP-ECHO-RESPONSE</li>
+          <li>Reserved: 7 bits</li>
+          <li>Return path: 1 bit flag, set when requesting a specific return path</li>
+          <li>Data Length : number of data octets following, length 16 bits</li>
+          <li>Identifier : A 16-bit request identifier. The identifier might be
+          set to a unique value to distinguish between different ESP Request sessions.
+          Response copy it from the request</li>
+          <li>Sequence number: A 16-bit field that increments with each echo
+          request sent.</li>
+          <li>Return path: 32 bits, optional requested return path SPI, when R is set.</li>
+          <li>Data : Optional data that follows the Echo request.</li>
+        </ul>
+      </section>
+    </section>
+    <section anchor="Security" numbered="true" toc="default">
+      <!-- All drafts are required to have a security considerations section. See RFC 3552 for a guide. -->
+      <name>Security Considerations</name>
+      <t>The security considerations are similar to other unconnected
+      request-reply protocols such as ICMP or ICMPv6 echo. The proposed ESP
+      echo and response does not constitute an amplification attack because the
+      ESP Echo Reply is almost same size as the ESP Echo Request. Further this
+      can be rate limited or filtered using ingress filtering per BCP 38
+      <xref target="RFC2827"/></t>
+    </section>
+    <section anchor="IANA">
+      <!-- All drafts are required to have an IANA considerations section. See RFC 8126 for a guide.-->
+      <name>IANA Considerations</name>
+    <t>
+    This document updates <xref target="RFC9347"/> to allow ESP Echo Request and
+    ESP Echo Response without a successful negotiation of USE_AGGFRAG.
+    </t>
+    <t>
+        This document defines two new registrations for the IANA ESP <xref target="AGGFRAG"/> PAYLOAD Sub-Types.
+     </t>
+
+       <figure align="center" anchor="iana_requests_i">
+        <artwork align="left"><![CDATA[
+      Value   ESP AGGFRAG_PAYLOAD Sub-Type       Reference
+      -----   ------------------------------    ---------------
+      3       ESP-ECHO-REQUEST                  [this document]
+      4       ESP-ECHO-RESPONSE                 [this document]
+            ]]></artwork>
+      </figure>
+     </section>
+    <section anchor="Operations" toc="default">
+      <name>Operational Considerations</name>
+      <t>When an explicit return path is requested and the ESP Echo responder SHOULD
+      make best effort to respond via this path, however, if local policies do not allow
+      this respond via another SA.</t>
+      <t>A typical implementation would be a ESP Echo socket. And the socket
+      would allow to set outgoing SPI at creation, optionally matching source
+      and destination address. Once this set before sending any data.
+      Userspcace can only write payload</t>
+    </section>
+  </middle>
+  <back>
+    <references>
+      <name>References</name>
+      <references>
+        <name>Normative References</name>
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.4301.xml"/>
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.2827.xml"/>
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.2119.xml"/>
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.8174.xml"/>
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.7296.xml"/>
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.9347.xml"/>
+        <xi:include href="https://datatracker.ietf.org/doc/bibxml3/draft-ietf-ipsecme-multi-sa-performance.xml"/>
+        <xi:include href="https://datatracker.ietf.org/doc/bibxml3/draft-colitti-ipsecme-esp-ping.xml"/>
+        <reference anchor="AGGFRAG"
+      target="https://www.iana.org/assignments/esp-aggfrag-payload/esp-aggfrag-payload.xhtml"
+      quoteTitle="true">
+        <front>
+          <title>ESP AGGFRAG_PAYLOAD Sub-Types</title>
+          <author>
+            <organization showOnFrontPage="true">IANA</organization>
+          </author>
+        </front>
+      </reference>
+      </references>
+      <references>
+        <name>Informative References</name>
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.7110.xml"/>
+      </references>
+    </references>
+    <section anchor="Acknowledgements" numbered="false">
+      <name>Acknowledgments</name>
+      <t>ACKs TBD</t>
+    </section>
+  </back>
+</rfc>
