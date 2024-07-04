@@ -198,8 +198,9 @@ obsoletes="" submissionType="IETF" xml:lang="en" version="3">
   MUST not be concatenated, especially when USE_AGGFRAG is not
   successfully negotiated. This this request does not support requesting a specific
   return path.
-          </t>
-          <t>Additional payloads to request specific return path. [AA MPLS has some examples of this]</t>
+        </t>
+       <t> [AA when using USE_AGGFRAG tunnel is negotatied, responder may concatinate AGGFRAG_PAYLOAD Congestion control probe]
+       </t>
 
       <t>The Echo request and response payloads are not subject to IPsec Security Policy(SP),
       typically negotiated using IKEv2 a nd manually configured. End padding
