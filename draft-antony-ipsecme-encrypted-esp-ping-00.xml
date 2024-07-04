@@ -1,34 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<?xml-model href="rfc7991bis.rnc"?>
-<!-- Required for schema validation and schema-aware editing -->
-<!-- <?xml-stylesheet type="text/xsl" href="rfc2629.xslt" ?> -->
-<!-- This third-party XSLT can be enabled for direct transformations in XML processors, including most browsers -->
-<!DOCTYPE rfc
-[
-<!ENTITY nbsp "&#160;">
-<!ENTITY zwsp "&#8203;">
-<!ENTITY nbhy "&#8209;">
-<!ENTITY wj "&#8288;">
-]>
-<!-- If further character entities are required then they should be added to the DOCTYPE above.
-     Use of an external entity file is not recommended. -->
+<?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
 <rfc xmlns:xi="http://www.w3.org/2001/XInclude" category="std"
 docName="draft-antony-ipsecme-encrypted-esp-ping-00" ipr="trust200902"
-obsoletes="" submissionType="IETF" xml:lang="en" version="3">
+obsoletes="" updates="" submissionType="IETF" xml:lang="en" tocInclude="true"
+version="3" consensus="true">
   <front>
-    <title abbrev="esp-encrypted-ping">ESP Encrypted Echo Protocol</title>
+    <title abbrev="Encrypted Esp Ping">ESP Encrypted Echo Protocol</title>
     <seriesInfo name="Internet-Draft"
-    value="draft-antony-esp-encrypted-ping-00"/>
+    value="draft-antony-ipsecme-encrypted-esp-ping-00"/>
     <author initials="A." surname="Antony" fullname="Antony Antony">
-      <organization abbrev="secunet">secunet Security Networks
-      AG</organization>
+      <organization abbrev="secunet">secunet Security Networks AG</organization>
       <address>
         <email>antony.antony@secunet.com</email>
       </address>
     </author>
     <author fullname="Steffen Klassert" initials="S." surname="Klassert">
-      <organization abbrev="secunet">secunet Security Networks
-      AG</organization>
+      <organization abbrev="secunet">secunet Security Networks AG</organization>
       <address>
         <email>steffen.klassert@secunet.com</email>
       </address>
@@ -37,17 +24,18 @@ obsoletes="" submissionType="IETF" xml:lang="en" version="3">
     <area>Internet</area>
     <workgroup>IP Security Maintenance and Extensions</workgroup>
     <keyword>IPsec</keyword>
-    <keyword>esp</keyword>
+    <keyword>ESP</keyword>
+    <keyword>Ping</keyword>
     <abstract>
-      <t>This document defines an Encrypted ESP Echo Function, a novel
-      mechanism designed to assess the reachability of an IP Security (IPsec)
-      network path using Encapsulating Security Payload (ESP) packets. The
-      primary objective of this function is to facilitate the detection of
-      end-to-end path status dynamically in a reliable and efficient manner,
-      only using encrypted ESP packets between the IPsec peers. The echo
-      message can use existing congestion control payloads from
-      <xref target="RFC9347"/>and also specifies additional payloads,
-      specifically for bi-directional probing and requesting a return path.</t>
+      <t> This document defines an Encrypted ESP Echo Function, a novel
+  mechanism designed to assess the reachability of an IP Security (IPsec)
+  network path using Encapsulating Security Payload (ESP) packets. The
+  primary objective of this function is to facilitate the detection of
+  end-to-end path status dynamically in a reliable and efficient manner,
+  only using encrypted ESP packets between the IPsec peers. The Encrypted
+  Echo message can use existing congestion control payloads from RFC9347
+  or the message format specified here, with an optional preferred return
+  path</t>
     </abstract>
   </front>
   <middle>
@@ -194,17 +182,17 @@ obsoletes="" submissionType="IETF" xml:lang="en" version="3">
       Request, the ESP Echo Response MUST be encrypted and utilize the
       corresponding SPI. The receiver also sets the ESP Next Header value to
       AGGFRAG_PAYLOAD: 144, followed by the requested sub-type</t>
-			<t>
-			AGGFRAG_PAYLOAD Payload starts from ESP Next Header value: 144 and followed one of the two Request payloads specified.
-			</t>
+      <t>
+      AGGFRAG_PAYLOAD Payload starts from ESP Next Header value: 144 and followed one of the two Request payloads specified.
+      </t>
 
-			<section anchor="Congestion_Control" numbered="true" toc="default">
+      <section anchor="Congestion_Control" numbered="true" toc="default">
         <name>Using Congestion Control Payload</name>
 
         <t>IP-TFS Congestion Control AGGFRAG_PAYLOAD Payload Format as specified in
   <xref target="RFC9347"/> Section 6.1.2 can be used for Echo Request and
   response. When using this payload for Echo Request and response, IPv4 or IPv6 Data Block
-  MUST not be concatenated, especially when USE_AGGFRAG is not
+  MUST NOT be concatenated, especially when USE_AGGFRAG is not
   successfully negotiated. This this request does not support requesting a specific
   return path.
         </t>
@@ -226,7 +214,7 @@ obsoletes="" submissionType="IETF" xml:lang="en" version="3">
       taking action, such as tearing down the IPsec connection, read the
       incoming bytes. This would help avoid tearing down busy paths due to the
       missing ESP echo response.</t>
-			</section>
+      </section>
       <section anchor="ESP-Echo-Format" numbered="true" toc="default">
         <name>Encrypted ESP Ping Payload Format</name>
         <figure anchor="echo-echo-payload" align="left" suppress-title="false">
@@ -246,7 +234,7 @@ obsoletes="" submissionType="IETF" xml:lang="en" version="3">
 +-+-+-+-+-+-+-+-+-+-+-</artwork>
         </figure>
         <ul>
-          <li>Sub-Type: ESP_ECHO_REQUEST or ESP_ECHO_RESPONSE</li>
+          <li>Sub-Type: ESP-ECHO-REQUEST or ESP-ECHO-RESPONSE</li>
           <li>Reserved: 7 bits</li>
           <li>Return path: 1 bit flag, set when requesting a specific return path</li>
           <li>Data Length : number of data octets following, length 16 bits</li>
@@ -285,8 +273,8 @@ obsoletes="" submissionType="IETF" xml:lang="en" version="3">
         <artwork align="left"><![CDATA[
       Value   ESP AGGFRAG_PAYLOAD Sub-Type       Reference
       -----   ------------------------------    ---------------
-      3       ESP_ECHO_REQUEST                  [this document]
-      4       ESP_ECHO_RESPONSE                 [this document]
+      3       ESP-ECHO-REQUEST                  [this document]
+      4       ESP-ECHO-RESPONSE                 [this document]
             ]]></artwork>
       </figure>
      </section>
@@ -314,7 +302,7 @@ obsoletes="" submissionType="IETF" xml:lang="en" version="3">
         <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.9347.xml"/>
         <xi:include href="https://datatracker.ietf.org/doc/bibxml3/draft-ietf-ipsecme-multi-sa-performance.xml"/>
         <xi:include href="https://datatracker.ietf.org/doc/bibxml3/draft-colitti-ipsecme-esp-ping.xml"/>
-				<reference anchor="AGGFRAG"
+        <reference anchor="AGGFRAG"
       target="https://www.iana.org/assignments/esp-aggfrag-payload/esp-aggfrag-payload.xhtml"
       quoteTitle="true">
         <front>
