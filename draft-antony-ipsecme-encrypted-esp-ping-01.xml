@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
 <rfc xmlns:xi="http://www.w3.org/2001/XInclude" category="std"
-docName="draft-antony-ipsecme-encrypted-esp-ping-00" ipr="trust200902"
+docName="draft-antony-ipsecme-encrypted-esp-ping-01" ipr="trust200902"
 obsoletes="" updates="" submissionType="IETF" xml:lang="en" tocInclude="true"
 version="3" consensus="true">
   <front>
-    <title abbrev="Encrypted Esp Ping">ESP Encrypted Echo Protocol</title>
+    <title abbrev="Encrypted Esp Ping">Encrypted ESP Echo Protocol</title>
     <seriesInfo name="Internet-Draft"
-    value="draft-antony-ipsecme-encrypted-esp-ping-00"/>
+    value="draft-antony-ipsecme-encrypted-esp-ping-01"/>
     <author initials="A." surname="Antony" fullname="Antony Antony">
       <organization abbrev="secunet">secunet Security Networks AG</organization>
       <address>
