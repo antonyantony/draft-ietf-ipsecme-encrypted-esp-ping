@@ -162,13 +162,18 @@ obsoletes="" submissionType="IETF" xml:lang="en" version="3">
         explore multiple paths specifically</t>
       </section>
       <section anchor="ReceivedTraffic" numbered="true" toc="default">
-        <name>Also Track Incoming Traffic</name>
-        <t>In addition to probing the outgoing paths, it is essential to
-        monitor and account for the incoming traffic to ensure comprehensive
-        network visibility. Incoming SA traffic counters are unique to IPsec
-        compared to other tunneling or native IP connections. In IPsec, the
-        incoming counters reliably indicate a viable path. This should be taken
-        into account when probing IPsec paths.</t>
+        <name>Also Track Incoming Traffic for livenss check</name>
+        <t> In addition to probing the outgoing paths, it is essential to monitor and
+  account for the incoming traffic to ensure comprehensive network
+  visibility of IPsec. Incoming SA traffic counters are unique to IPsec
+  compared to other tunneling or native IP connections. In IPsec, the
+  incoming counters reliably indicate a viable path. This should be taken
+  into account when probing IPsec paths. For example, when the crypto
+  subsystem is overloaded, the responder may miss out on Encrypted ESP
+  Ping responses. However, tracking the incoming traffic after the ping
+  probe is sent would help applications to recognize the IPsec path is
+  still viable.
+        </t>
       </section>
     </section>
     <section anchor="Protocol" numbered="true" toc="default">
