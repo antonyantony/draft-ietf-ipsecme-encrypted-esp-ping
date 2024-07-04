@@ -1,5 +1,5 @@
-NEW_FILE?=draft-antony-ipsecme-esp-encrypted-ping-00
-OLD_FILE?=draft-antony-ipsecme-esp-encrypted-ping-00
+NEW_FILE?=draft-antony-ipsecme-encrypted-esp-ping-00
+OLD_FILE?=draft-antony-ipsecme-encrypted-esp-ping-00
 MP-SUFF ?= $(mktemp -u XXXXXX)
 TMP_FILE ?= $(NEW_FILE)-$(TMP-SUFF)
 
