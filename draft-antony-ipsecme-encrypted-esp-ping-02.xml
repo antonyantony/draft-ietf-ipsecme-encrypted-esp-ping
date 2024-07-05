@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
 <rfc xmlns:xi="http://www.w3.org/2001/XInclude" category="std"
-docName="draft-antony-ipsecme-encrypted-esp-ping-01" ipr="trust200902"
+docName="draft-antony-ipsecme-encrypted-esp-ping-02" ipr="trust200902"
 obsoletes="" updates="" submissionType="IETF" xml:lang="en" tocInclude="true"
 version="3" consensus="true">
   <front>
     <title abbrev="Encrypted Esp Ping">Encrypted ESP Echo Protocol</title>
-    <seriesInfo name="Internet-Draft"
-    value="draft-antony-ipsecme-encrypted-esp-ping-01"/>
     <author initials="A." surname="Antony" fullname="Antony Antony">
       <organization abbrev="secunet">secunet Security Networks AG</organization>
       <address>
@@ -27,7 +25,7 @@ version="3" consensus="true">
     <keyword>ESP</keyword>
     <keyword>Ping</keyword>
     <abstract>
-      <t> This document defines an Encrypted ESP Echo Function, a novel
+      <t> This document defines an Encrypted ESP Echo Function. a
   mechanism designed to assess the reachability of an IP Security (IPsec)
   network path using Encapsulating Security Payload (ESP) packets. The
   primary objective of this function is to facilitate the detection of
@@ -106,27 +104,29 @@ version="3" consensus="true">
         from an IPsec peer. Each SA may traverse different network paths and
         may have different policies. The ESP Encrypted Ping would specifically
         help determine the reachability of each path independently.</t>
-			 </section>
+      </section>
       <section anchor="ReturnPath" numbered="true" toc="default">
        <name>Probe Return Path</name>
         <t>
     IPsec Security Associations (SAs) are negotiated as a pair, consisting of two
     unidirectional SAs in one exchange. IKEv2 <xref target="RFC7296"/> Section 2.9 allows
     installing multiple Child SAs with identical Traffic Selectors. When there are multiple
-    paths, the Encrypte ESP Ping should support requesting an echo response via
+    paths, the Encrypted ESP Ping should support requesting an echo response via
     a specific return path IPsec SA. To request a return path, additional
-    attributes are necessary. The sender proposes a specific SPI as the
-    preferred return path. The proposed return path SPI MUST be
-    present on the local system with the same endpoint as the destination. A specific return
-    path is necessary when the sender would like to probe a path, and there are multiple
-    possible paths present. For example, if there is a path over a satellite link and over
-    fiber, the receiving peer may have a policy to respond via the fiber path even when the
-    request arrives via the satellite link. If the sender requests a return path, the receiver
-    SHOULD try to respond via that path, IPsec SA. However, the final decision is up to the
-    receiver. If the receiver decides to send the response via a different path than the
-    requested return path, the sender would notice the chosen path in the response. An example
-    is Return Path Specified LSP ping specified in <xref target="RFC7110"/>.
-       </t>
+    attributes are necessary. The initiator may propose a specific SPI as the
+    preferred return path. A specific return path SPI is necessary when to
+    probe a specific path among multiple possible SAs between same peer.
+    Multiple paths can exist for various reasons, either
+    <xref target="I-D.ietf-ipsecme-multi-sa-performance"/> or a primary and
+    secondary path scenario. For example over a satellite link and over fiber,
+    the receiving peer may have a policy to respond via the fiber path even
+    when the request arrives via the satellite link. If the initiator requests
+    a return path, the responder SHOULD try to respond via that path, IPsec SA.
+    However, the final decision is up to the responder. If the responder decides
+    to send the response via a different path than the requested return path,
+    the initiator SHOULD notice it and notify the initiator application.
+    An example is Return Path Specified LSP ping specified in
+   <xref target="RFC7110"/>.</t>
      </section>
      <section anchor="IPTFS-Band-Width" numbered="true" toc="default">
         <name>Manually Probing a Constant Rate on the AGGFRAG Tunnel</name>
@@ -143,14 +143,14 @@ version="3" consensus="true">
         <t>Existing tools such as ICMP ping or traceroute assume IP
         connectivity. However, in IPsec gateway setups, the gateway itself may
         not have an IP address that matches the IPsec Security Policy Database
-        (SPD). Due to this, ESP messages must be used without relying on the
-        SPD.</t>
+        (SPD). A peer MUST accept Encrypted ESP Ping messages even when it
+        does not math a local SPD.</t>
         <t>Additionally, in the case of multiple SAs as mentioned above, IP
         tools would find it hard, if not impossible, to generate IP traffic to
         explore multiple paths specifically</t>
       </section>
       <section anchor="ReceivedTraffic" numbered="true" toc="default">
-        <name>Also Track Incoming Traffic for livenss check</name>
+        <name>Also Track Incoming Traffic for liveness check</name>
         <t> In addition to probing the outgoing paths, it is essential to monitor and
   account for the incoming traffic to ensure comprehensive network
   visibility of IPsec. Incoming SA traffic counters are unique to IPsec
@@ -172,7 +172,7 @@ version="3" consensus="true">
       Request. The ESP Echo Request packet must be encrypted. If the SPIs are
       negotiated it SHOULD utilize an SPI value previously negotiated, e.g.
       negotiated through IKEv2.</t>
-      <t>The sender sets the ESP Next Header value to AGGFRAG_PAYLOAD which has
+      <t>The initiator sets the ESP Next Header value to AGGFRAG_PAYLOAD which has
       the value 144, as specified in
       <xref target="RFC9347"/>. This can be followed by different echo request
       sub-type payloads with a well defined format and optional empty data blocks
@@ -180,7 +180,7 @@ version="3" consensus="true">
       <t>The receiving IPsec peer, having established ESP through IKE, MAY
       respond to an ESP Echo Response. When replying to an encrypted ESP Echo
       Request, the ESP Echo Response MUST be encrypted and utilize the
-      corresponding SPI. The receiver also sets the ESP Next Header value to
+      corresponding SPI. The responder also sets the ESP Next Header value to
       AGGFRAG_PAYLOAD: 144, followed by the requested sub-type</t>
       <t>
       AGGFRAG_PAYLOAD Payload starts from ESP Next Header value: 144 and followed one of the two Request payloads specified.
@@ -246,6 +246,17 @@ version="3" consensus="true">
           <li>Return path: 32 bits, optional requested return path SPI, when R is set.</li>
           <li>Data : Optional data that follows the Echo request.</li>
         </ul>
+      </section>
+      <section anchor="ReturnPathValidation" numbered="true" toc="default">
+       <name>Return Path Validation</name>
+        <t>
+    On the initiator, the return path SPI in the request MUST be in the
+    local SADB with the same peer as the destination. The responder should
+    also validate the requested return path SPI. When the SPI does not match
+    the initiator in the SPD, the responder MUST NOT respond via the
+    requested SPI. This is specifically to avoid amplification or DDoS.
+    However, the responder MAY respond to the peer using its default SPI.
+       </t>
       </section>
     </section>
     <section anchor="Security" numbered="true" toc="default">
