@@ -34,19 +34,22 @@ defined here, with an option to specify a preferred return path when
 there is more than one pair of IPsec SAs between the same set of
 IPsec peers.
 
+A peer MAY announce the support using a new IKEv2 Status Notifcation
+ENCRYPTED_PING_SUPPORTED.
+
 #+end_abstract
 #+RFC_KEYWORDS: ("IPsec" "ESP" "Ping")
 
 * Introduction
 
-
 In response to the operational need for a robust data-plane
 failure-detection mechanism for IP Security (IPsec) Encapsulating
 Security Payload (ESP) from [[RFC4303]], this document introduces
 Encrypted ESP Ping, including the Echo Request and Response.
-This protocol offers a solution for assessing network path reachability
-dynamically and can optionally specify a return path for echo Reply
-messages.
+This protocol offers a solution for assessing network path
+reachability dynamically and can optionally specify a return path for
+echo Reply messages. The IPsec peer may announce its capability to
+support Encrypted ESP Ping using an IKEv2 Notification Status Type.
 
 This document covers only Encrypted ESP Ping, typically used after
 an IKE negotiation, while [[I-D.colitti-ipsecme-esp-ping]] specifies
@@ -277,6 +280,21 @@ via the requested SPI. This is specifically to avoid amplification or
 DDoS. However,the responder MAY respond to the peer using its
 default Security Parameter Index (SPI).
 
+
+* IKEv2 Notification
+
+The peer MAY announce support for Encrypted ESP Ping functionality
+using the Notification Status Type `ENCRYPTED_PING_SUPPORTED` during
+the IKEv2 negotiation, in the IKE_AUTH exchange. This announcement
+allows the initiator to determine if the peer supports Encrypted ESP
+Ping, enabling a reliable expectation of responses.
+
+By advertising this support, peers enhance their ability to perform
+dynamic path reachability assessments for diagnostic purposes.
+However, this does not guarantee a response to every request a peer
+receives. Responding to each request remains a local policy decision,
+depending on the resources available at the time.
+
 * IANA Considerations
 
 This document updates [[RFC9347]] to allow ESP Echo Request and ESP
@@ -285,7 +303,7 @@ Echo Response without a successful negotiation of USE_AGGFRAG.
 This document defines two new registrations for the IANA ESP
 [[AGGFRAG]] PAYLOAD Sub-Types.
 
-#+name: iana_requests_i
+#+name: iana_requests_aggfrag
 #+begin_src
 
       Value   ESP AGGFRAG_PAYLOAD Sub-Type       Reference
@@ -294,6 +312,19 @@ This document defines two new registrations for the IANA ESP
       3       ESP-ECHO-RESPONSE                 [this document]
 
 #+end_src
+
+This document defines one new registration for the IANA
+"IKEv2 Notify Message Status Types" [[STATUSNOTIFY]].
+
+#+name: iana_requests_status
+#+begin_src
+
+      Value     Notify Message Status Type      Reference
+      -------  ----------------------------    ---------------
+      [TBD1]    ENCRYPTED_PING_SUPPORTED.       [this document]
+
+#+end_src
+
 
 * Operational Considerations
 
@@ -340,6 +371,14 @@ per BCP 38 [[RFC2827]]
 :REF_TITLE: ESP AGGFRAG_PAYLOAD Registry
 :REF_ORG: IANA
 :END:
+** STATUSNOTIFY
+:PROPERTIES:
+:REF_TARGET: https://www.iana.org/assignments/esp-aggfrag-payload/esp-aggfrag-payload.xhtml
+:REF_TITLE: IKEv2 Notify Message Status Types
+:REF_ORG: IANA
+:END:
+
+
 
 * Additional Stuff
 
