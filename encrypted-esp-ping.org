@@ -373,7 +373,7 @@ per BCP 38 [[RFC2827]]
 :END:
 ** STATUSNOTIFY
 :PROPERTIES:
-:REF_TARGET: https://www.iana.org/assignments/esp-aggfrag-payload/esp-aggfrag-payload.xhtml
+:REF_TARGET: https://www.iana.org/assignments/ikev2-parameters/ikev2-parameters.xhtml#ikev2-parameters-16
 :REF_TITLE: IKEv2 Notify Message Status Types
 :REF_ORG: IANA
 :END:
