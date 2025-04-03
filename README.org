@@ -3,10 +3,10 @@ Encrypted ESP Ping
 This is the working area for the WG Internet-Draft, *Encrypted ESP Echo Protocol*
 
 * [[https://antonyantony.github.io/draft-ietf-ipsecme-encrypted-esp-ping/draft-ietf-ipsecme-encrypted-esp-ping-latest.html][Editor's Copy]]
-* [[https://datatracker.ietf.org/doc/draft-antony-ipsecme-encrypted-esp-ping//][Datatracker Page]]
-* [[https://author-tools.ietf.org/api/iddiff?doc_1=draft-antony-ipsecme-encrypted-esp-ping/&url_2=https://raw.githubusercontent.com/antonyantony/draft-antony-ipsecme-encrypted-esp-ping//refs/heads/gh-pages/draft-antony-ipsecme-encrypted-esp-ping-latest.txt][diff with last submission]]
+* [[https://datatracker.ietf.org/doc/draft-ietf-ipsecme-encrypted-esp-ping//][Datatracker Page]] WG docuemnt.
+* [[https://author-tools.ietf.org/api/iddiff?doc_1=draft-ietf-ipsecme-encrypted-esp-ping/&url_2=https://raw.githubusercontent.com/antonyantony/draft-ietf-ipsecme-encrypted-esp-ping//refs/heads/gh-pages/draft-ietf-ipsecme-encrypted-esp-ping.txt][diff with last submission]]
 
-* [[https://github.com/antonyantony/draft-antony-ipsecme-encrypted-esp-ping//blob/main/CONTRIBUTING.md][Contributing]]
+* [[https://github.com/antonyantony/draft-ietf-ipsecme-encrypted-esp-ping//blob/main/CONTRIBUTING.md][Contributing]]
 
 Contributions can be made by creating pull requests.
 The GitHub interface supports creating pull requests using the Edit (✏) button.
