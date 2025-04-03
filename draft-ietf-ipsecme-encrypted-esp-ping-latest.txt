@@ -9,7 +9,7 @@ Expires: 5 October 2025                                     3 April 2025
 
 
                       Encrypted ESP Echo Protocol
-                draft-ietf-ipsecme-encrypted-esp-ping-05
+                draft-ietf-ipsecme-encrypted-esp-ping-00
 
 Abstract
 
