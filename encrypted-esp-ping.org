@@ -4,8 +4,8 @@
 #+OPTIONS: prop:nil title:t toc:t \n:nil ::t |:t ^:{} -:t *:t ':nil
 
 #+RFC_CATEGORY: std
-#+RFC_NAME: draft-antony-ipsecme-encrypted-esp-ping
-#+RFC_VERSION: 05
+#+RFC_NAME: draft-ietf-ipsecme-encrypted-esp-ping
+#+RFC_VERSION: 00
 #+RFC_IPR: trust200902
 #+RFC_STREAM: IETF
 #+RFC_XML_VERSION: 3
