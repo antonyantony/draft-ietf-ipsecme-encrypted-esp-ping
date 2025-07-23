@@ -246,7 +246,7 @@ tearing down busy paths due to the missing ESP echo response.
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |Sub-type       | Reserved    |R|Data Length                    |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|Identifier (ID)|Sequence Number                                |
+|Identifier (ID)              |Sequence Number                  |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 | Return path SPI                                               |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -256,7 +256,7 @@ tearing down busy paths due to the missing ESP echo response.
 
 - Sub-Type: ESP-ECHO-REQUEST or ESP-ECHO-RESPONSE
 - Reserved: 7 bits
-- Return path: 1 bit flag, set when requesting a specific return path
+- Return path: 1 bit flag, set when requesting a specific return path SPI
 - Data Length : number of data octets following, length 16 bits
 - Identifier : A 16-bit request identifier. The identifier SHOULD be set
   to a unique value to distinguish between different ESP Request
@@ -264,7 +264,7 @@ tearing down busy paths due to the missing ESP echo response.
 - Sequence number: A 16-bit field that increments with each echo
   request sent.
 - Return path: 32 bits, optional requested return path SPI, when R is
-  set.
+  set to one.
 - Data : Optional data that follows the Echo request.
 
 The responder SHOULD copy the request message and MUST change the
