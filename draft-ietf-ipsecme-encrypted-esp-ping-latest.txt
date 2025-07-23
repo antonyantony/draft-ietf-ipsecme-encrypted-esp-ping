@@ -5,7 +5,7 @@
 IP Security Maintenance and Extensions                         A. Antony
 Internet-Draft                                               S. Klassert
 Intended status: Standards Track                                 secunet
-Expires: 5 October 2025                                     3 April 2025
+Expires: 24 January 2026                                    23 July 2025
 
 
                       Encrypted ESP Echo Protocol
@@ -43,7 +43,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 5 October 2025.
+   This Internet-Draft will expire on 24 January 2026.
 
 Copyright Notice
 
@@ -53,9 +53,9 @@ Copyright Notice
 
 
 
-Antony & Klassert        Expires 5 October 2025                 [Page 1]
+Antony & Klassert        Expires 24 January 2026                [Page 1]
 
-Internet-Draft             Encrypted Esp Ping                 April 2025
+Internet-Draft             Encrypted Esp Ping                  July 2025
 
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -109,9 +109,9 @@ Table of Contents
 
 
 
-Antony & Klassert        Expires 5 October 2025                 [Page 2]
+Antony & Klassert        Expires 24 January 2026                [Page 2]
 
-Internet-Draft             Encrypted Esp Ping                 April 2025
+Internet-Draft             Encrypted Esp Ping                  July 2025
 
 
 1.1.  Terminology
@@ -165,9 +165,9 @@ Internet-Draft             Encrypted Esp Ping                 April 2025
 
 
 
-Antony & Klassert        Expires 5 October 2025                 [Page 3]
+Antony & Klassert        Expires 24 January 2026                [Page 3]
 
-Internet-Draft             Encrypted Esp Ping                 April 2025
+Internet-Draft             Encrypted Esp Ping                  July 2025
 
 
 3.2.  Probing Multiple Paths
@@ -221,9 +221,9 @@ Internet-Draft             Encrypted Esp Ping                 April 2025
 
 
 
-Antony & Klassert        Expires 5 October 2025                 [Page 4]
+Antony & Klassert        Expires 24 January 2026                [Page 4]
 
-Internet-Draft             Encrypted Esp Ping                 April 2025
+Internet-Draft             Encrypted Esp Ping                  July 2025
 
 
 3.5.  Why Not Use Existing IP Tools
@@ -277,9 +277,9 @@ Internet-Draft             Encrypted Esp Ping                 April 2025
 
 
 
-Antony & Klassert        Expires 5 October 2025                 [Page 5]
+Antony & Klassert        Expires 24 January 2026                [Page 5]
 
-Internet-Draft             Encrypted Esp Ping                 April 2025
+Internet-Draft             Encrypted Esp Ping                  July 2025
 
 
 4.1.  Using Congestion Control Payload
@@ -320,7 +320,7 @@ Internet-Draft             Encrypted Esp Ping                 April 2025
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
    |Sub-type       | Reserved    |R|Data Length                    |
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |Identifier (ID)|Sequence Number                                |
+   |Identifier (ID)              |Sequence Number                  |
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
    | Return path SPI                                               |
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -333,13 +333,13 @@ Internet-Draft             Encrypted Esp Ping                 April 2025
 
 
 
-Antony & Klassert        Expires 5 October 2025                 [Page 6]
+Antony & Klassert        Expires 24 January 2026                [Page 6]
 
-Internet-Draft             Encrypted Esp Ping                 April 2025
+Internet-Draft             Encrypted Esp Ping                  July 2025
 
 
    *  Return path: 1 bit flag, set when requesting a specific return
-      path
+      path SPI
 
    *  Data Length : number of data octets following, length 16 bits
 
@@ -351,7 +351,7 @@ Internet-Draft             Encrypted Esp Ping                 April 2025
       request sent.
 
    *  Return path: 32 bits, optional requested return path SPI, when R
-      is set.
+      is set to one.
 
    *  Data : Optional data that follows the Echo request.
 
@@ -389,9 +389,9 @@ Internet-Draft             Encrypted Esp Ping                 April 2025
 
 
 
-Antony & Klassert        Expires 5 October 2025                 [Page 7]
+Antony & Klassert        Expires 24 January 2026                [Page 7]
 
-Internet-Draft             Encrypted Esp Ping                 April 2025
+Internet-Draft             Encrypted Esp Ping                  July 2025
 
 
    This document defines two new registrations for the IANA ESP
@@ -445,9 +445,9 @@ Internet-Draft             Encrypted Esp Ping                 April 2025
 
 
 
-Antony & Klassert        Expires 5 October 2025                 [Page 8]
+Antony & Klassert        Expires 24 January 2026                [Page 8]
 
-Internet-Draft             Encrypted Esp Ping                 April 2025
+Internet-Draft             Encrypted Esp Ping                  July 2025
 
 
               colitti-ipsecme-esp-ping-03, 7 November 2024,
@@ -501,9 +501,9 @@ Internet-Draft             Encrypted Esp Ping                 April 2025
 
 
 
-Antony & Klassert        Expires 5 October 2025                 [Page 9]
+Antony & Klassert        Expires 24 January 2026                [Page 9]
 
-Internet-Draft             Encrypted Esp Ping                 April 2025
+Internet-Draft             Encrypted Esp Ping                  July 2025
 
 
    [RFC9611]  Antony, A., Brunner, T., Klassert, S., and P. Wouters,
@@ -557,4 +557,4 @@ Authors' Addresses
 
 
 
-Antony & Klassert        Expires 5 October 2025                [Page 10]
+Antony & Klassert        Expires 24 January 2026               [Page 10]
