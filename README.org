@@ -4,7 +4,7 @@ This is the working area for the WG Internet-Draft, *Encrypted ESP Echo Protocol
 
 * [[https://antonyantony.github.io/draft-ietf-ipsecme-encrypted-esp-ping/draft-ietf-ipsecme-encrypted-esp-ping-latest.html][Editor's Copy]]
 * [[https://datatracker.ietf.org/doc/draft-ietf-ipsecme-encrypted-esp-ping//][Datatracker Page]] WG docuemnt.
-* [[https://author-tools.ietf.org/api/iddiff?doc_1=draft-ietf-ipsecme-encrypted-esp-ping/&url_2=https://raw.githubusercontent.com/antonyantony/draft-ietf-ipsecme-encrypted-esp-ping//refs/heads/gh-pages/draft-ietf-ipsecme-encrypted-esp-ping.txt][diff with last submission]]
+* [[https://author-tools.ietf.org/api/iddiff?doc_1=draft-ietf-ipsecme-encrypted-esp-ping&url_2=https://antonyantony.github.io/draft-ietf-ipsecme-encrypted-esp-ping/draft-ietf-ipsecme-encrypted-esp-ping-latest.txt][Diff with last submission]]
 
 * [[https://github.com/antonyantony/draft-ietf-ipsecme-encrypted-esp-ping//blob/main/CONTRIBUTING.md][Contributing]]
 
