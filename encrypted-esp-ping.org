@@ -114,7 +114,11 @@ Operational experience suggests that networks and some home routers
 that drop ESP packets are common enough to cause problems for general-
 purpose VPN applications that require reliable performance on the
 Internet. Encrypted ESP Ping would greatly assist in diagnosing these
-scenarios.
+scenarios. When IKEv2 operates over TCP to accommodate
+large post-quantum key exchanges while ESP may use a separate network
+path, Encrypted ESP Ping can verify ESP reachability
+independently of the IKEv2 control channel
+[[I-D.ietf-ipsecme-ikev2-reliable-transport]].
 
 
 ** Probing Multiple Paths
@@ -390,6 +394,7 @@ per BCP 38 [[RFC2827]]
 
 ** RFC7110
 ** I-D.ietf-ipsecme-esp-ping
+** I-D.ietf-ipsecme-ikev2-reliable-transport
 
 
 
