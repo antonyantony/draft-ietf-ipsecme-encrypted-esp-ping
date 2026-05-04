@@ -1,0 +1,223 @@
+Hi Valery,
+
+Thank you for the detailed review.
+Responses inline. I am on vacation, and trying to get this moving forward.
+
+On Tue, Apr 21, 2026 at 06:48:39PM +0300, Valery Smyslov wrote:
+
+> 1. Abstract
+>     "A peer MAY announce the support using a new IKEv2 Status Notifcation ENCRYPTED_PING_SUPPORTED.":
+>      a. typo s/Notifcation/Notification
+>      b. RFC2119 keywords must not be used in Abstract
+
+Fixed both.
+
+> 2. Section 1
+>    "The IPsec peer may announce its capability to support Encrypted ESP Ping using an IKEv2 Notification Status Type."
+>     I wonder why "may"? If peers do not negotiate support for this feature, then how the result of the encrypted ping
+>     can be reliably interpreted in case no response is received?
+
+Redesigned to use two explicit modes of operation, each requiring its own
+negotiation. In Mode 1, peers that have negotiated USE_AGGFRAG [RFC9347] use
+the existing Congestion Control payload. In Mode 2, peers negotiate
+ENCRYPTED_PING_SUPPORTED via IKEv2 and use the new payload format defined in
+this document. In both modes a negotiation is required, so once negotiated
+lack of response can be reliably interpreted as path failure.
+Section 1 has been rewritten to describe both modes explicitly.
+
+> 3. Section 1.1
+>     The term " Return Path Specified LSP Ping" is not used in the document (only "LSP ping" is used once).
+>     Do you need to specify this term? Perhaps it's easy to expand what is "LSP ping" where it is used
+>     and remove this definition.
+
+Fixed. Removed the definition from Terminology. Added a brief mention of RFC7110 in
+the Introduction for context, and moved RFC7110 to Informative References.
+
+> 4. Section 3.3
+>    "When there are multiple paths, the Encrypted ESP Ping should support requesting an echo response via a
+>    specific return path IPsec SA."
+>    Shouldn't "should" be "SHOULD"?
+
+Fixed.
+
+> 5. Section 3.3
+>     "If the initiator requests a return path, the responder SHOULD try to respond via that path, IPsec SA."
+>     I would suggest to rephrase this for readability; either remove ", IPsec SA" or remove "path,".
+
+Fixed. Changed to: "the responder SHOULD try to respond via that IPsec SA."
+
+> 6. Section 3.3
+>     "If the responder decides to send the response via a different path than the requested
+>    return path, the initiator SHOULD notice it and notify the initiator application."
+>    What is meant by "notify the initiator application"? What application, if ping
+>    request was initiated by IPsec module itself? How to notify? What it is supposed
+>    to do with this notification?
+
+Changed to: "the initiator SHOULD detect this mismatch and report it,
+e.g., via a status code to the requesting process." How to report is intentionally
+left implementation-specific.
+
+> 7. Section 3.3
+>     "An example is Return Path Specified LSP ping specified in [RFC7110]."
+>     I'm not sure this reference is helpful unless more clarifications are added
+>     why it is helpful. Perhaps just mention somewhere in the Introduction
+>     that this document is similar to approach defined in RFC 7110 and remove this sentence.
+
+Done as suggested. Removed from Section 3.3. Added to Introduction: "The approach
+for specifying a preferred return path is inspired by Return Path Specified LSP
+Ping [RFC7110]." RFC7110 moved to Informative References.
+
+> 8. Section 3.4
+>     It is not clear for me how this section is related to the scope of the document.
+>     Perhaps some clarifications are needed.
+
+Rewrote Section 3.4 to correctly reflect the relationship: AGGFRAG probes (at
+constant or variable rate) can derive reachability information for the IPsec SA,
+similar to Encrypted ESP Ping. Since probes travel over an IPsec tunnel, the
+reachability information is reliable. IP-TFS [RFC9347] uses AGGFRAG at a constant
+rate; an Encrypted ESP Ping application may also send AGGFRAG payloads for manual
+diagnostic purposes.
+
+> 9. Section 3.4
+>     IP-TFS should be expanded here and a reference to RFC 9347 should be added.
+
+Fixed. Expanded to "IP Traffic Flow Security (IP-TFS) [RFC9347]".
+
+> 10. Section 3.6
+>    "Incoming SA traffic counters are unique to
+>    IPsec compared to other tunneling or native IP connections.  In
+>    IPsec, the incoming counters reliably indicate a viable path."
+>    What are "SA traffic counters"?
+
+Fixed. Changed to: "Incoming per-SA byte and packet counters maintained by IPsec
+are cryptographically verified: a counter can only increment if a valid
+authenticated ESP packet was received. These counters reliably indicate a viable
+path."
+
+> 11. Section 4
+>     "The ESP Echo Request packet must be encrypted." and later "the ESP Echo Response MUST be encrypted"
+>     I wonder why it must be encrypted. It is sent over ESP and as any other traffic
+>     sent over an SA receives the same level of protection. For example, if AES-GMAC
+>     is negotiated for this SA, encryption is not possible.
+
+"must be encrypted" was imprecise. Changed to: "The ESP Echo
+Request MUST be sent as an ESP packet using the established SA, receiving the same
+level of protection as any other traffic on that SA." Applied the same fix to the
+Response. This correctly accommodates integrity-only SAs such as AES-GMAC.
+
+> 12. Section 4
+>    "If the SPIs are negotiated it SHOULD utilize an SPI value previously negotiated,
+>    e.g. negotiated through IKEv2."
+>    What other options exist? Use random SPI? Then how to protect ping with non-existing SA?
+
+The intent was to cover both IKEv2-negotiated and manually keyed SAs. Rephrased to:
+"It SHOULD use an SPI value previously established, whether negotiated through
+IKEv2 or configured manually."
+
+> 13. Section 4
+>     "The initiator sets the ESP Next Header value to AGGFRAG_PAYLOAD which
+>     has the value 144, as specified in [RFC9347]. This can be followed
+>     by different echo request sub-type payloads with a well defined
+>     format and optional empty data blocks following it"
+>    It is not clear how the Next Header field can be followed by anything, since it is
+>    the last field in ESP packet. Please, rephrase.
+
+Fixed. Changed to: "The initiator sets the ESP Next Header field to
+AGGFRAG_PAYLOAD (144), as specified in [RFC9347]. The ESP payload contains one of
+the echo request sub-type payloads defined in this document, optionally followed by
+padding."
+
+> 14. Section 4.
+>    "AGGFRAG_PAYLOAD Payload starts from ESP Next Header value: 144 and
+>    followed one of the two Request payloads specified."
+>    The ESP Next Header value is the last field in ESP, followed only by ICV.
+>     Please, rephrase.
+
+Fixed. Replaced with a sentence clarifying the two formats: "Two payload formats
+are defined: the existing Congestion Control payload (Section 4.1) and the new
+Encrypted ESP Ping payload (Section 4.2)."
+
+> 15. Section 4.1
+>     From my understanding reading so far, two different formats for encrypted ESP ping
+>     are possible - one re-using AGGFRAG Congestion Control and the other one defined
+>     in Section 4.2. If so, it must be made more clear before.
+>
+>     typos   s/This this/This    s/ a nd/and    s/padding padding/padding      s/of the the/if the
+
+Clarification added at the start of Section 4 (see #14). All four typos fixed.
+
+> 16. Section 4.2
+>     Figure is broken (R field is misplaced)
+
+Fixed. Moved R bit to position 8 (immediately after Sub-type, before Reserved).
+Reordered the field description list to match: Sub-Type, R (Return path flag),
+Reserved, Data Length.
+
+> 17. Section 4.2
+>     "Response copy it from the request"
+>     Responder copies?
+
+Fixed. Changed to: "The responder copies it from the request."
+
+> 18. Section 4.2
+>     "The responder SHOULD copy the request message and MUST change the
+>     Sub-type to ESP-ECHO-RESPONSE."
+>     What alternatives are possible for SHOULD?
+
+The SHOULD allows a responder to send a minimal response with a shorter or empty
+data section when resources are constrained, rather than echoing the full request
+payload. Added a clarifying sentence after the SHOULD.
+
+> 19. Section 4.3
+>    "However,the responder MAY respond to the peer
+>    using its default Security Parameter Index (SPI)."
+>    What is the "default SPI"?
+
+Fixed. Changed to: "However, the responder MAY respond using the SPI of the SA on
+which the request was received."
+
+> 20. Section 5
+>     Since negotiation is optional, I think that the document must be more specific on how
+>     to interpret the lack of response in case the encrypted ping is not negotiated.
+>     Should it continue to ping its peer, or give up? Should it use SA or try to create another one
+>     (e.g. with a different transport)? I believe that optionality of negotiation undermines
+>     the usefulness of this feature.
+
+Section 5 rewritten to reflect the two-mode design. When
+ENCRYPTED_PING_SUPPORTED has been negotiated (Mode 2), the peer SHOULD respond
+to ESP Echo Requests and a lack of response after a configurable timeout MAY be
+treated as path failure. For Mode 1 (USE_AGGFRAG), the commitment to respond is
+implicit in the USE_AGGFRAG negotiation itself. There is no unnegotiated mode of
+operation.
+
+> 21. Section 6
+>     "This document updates [RFC9347] to allow ESP Echo Request and ESP
+>     Echo Response without a successful negotiation of USE_AGGFRAG."
+>     I believe this text is misplaced - it must not be in IANA Considerations.
+>     And if this document updates RFC 9347, then it must be stated in metadata, Abstract and Introduction.
+
+Fixed. Moved this statement to the Introduction. Added "Updates: RFC9347" to the
+document metadata (#+RFC_UPDATES). The Abstract now also notes this is an update
+to RFC9347.
+
+> 22. Section 6
+>    2       ESP-ECHO-REQUEST                  [this document]
+>    3       ESP-ECHO-RESPONSE                 [this document]
+>    Why concrete values are specified here and are not requested from IANA?
+
+Fixed. Changed to [TBD2] and [TBD3], to be assigned by IANA.
+
+> 23. Section 10
+>    RFC8194 is not referenced.
+>    I wonder why all references are normative (including those that definitely are not needed to implement this functionality).
+
+Fixed. Removed RFC8194 (listed in references but never cited in the text).
+Removed RFC9611 entirely -- it was cited only for context in the use cases
+section and RFC7296 already covers multiple Child SAs sufficiently. Split
+remaining references into Normative and Informative sections. RFC7110 and
+
+Thanks again for the thorough review!
+
+Antony
+
+PS: the authors hopping to merge this with ietf-ipsecme-esp-ping.
