@@ -25,10 +25,9 @@
 #+begin_abstract
 
 This document defines the Encrypted ESP Echo Function, a mechanism
-designed to assess the reachability of IP Security (IPsec) network
-paths using Encapsulating Security Payload (ESP) packets. The primary
-objective is to reliably and efficiently detect the status of
-end-to-end paths by exchanging only encrypted ESP packets between
+to assess the reachability of IP Security (IPsec) network
+paths using Encapsulating Security Payload (ESP) packets. It detects
+end-to-end path status by exchanging only encrypted ESP packets between
 IPsec peers. The Encrypted Echo message can either use existing
 congestion control payloads from RFC9347 or a new message format
 defined here, with an option to specify a preferred return path when
@@ -47,9 +46,8 @@ In response to the operational need for a data-plane
 failure-detection mechanism for IP Security (IPsec) Encapsulating
 Security Payload (ESP) from [[RFC4303]], this document introduces
 Encrypted ESP Ping, including the Echo Request and Response.
-This protocol offers a solution for assessing network path
-reachability dynamically and can optionally specify a return path for
-echo Reply messages.
+This protocol assesses network path reachability dynamically and can
+optionally specify a return path for echo Reply messages.
 
 Encrypted ESP Ping supports two modes of operation. In the first
 mode, peers that have negotiated USE_AGGFRAG [[RFC9347]] can use the
@@ -91,10 +89,9 @@ capitals, as shown here.
 
 * Use cases
 
-Diagnosing operational problems in IPsec can be challenging. The
-proposed Encrypted ESP Echo function aims to address some of these
-challenges by providing a reliable and efficient diagnostic protocol,
-enabling the development of effective tools; e.g. Encrypted ESP Ping.
+Diagnosing operational problems in IPsec can be challenging.
+Encrypted ESP Echo addresses these challenges; Encrypted ESP Ping is
+one such tool.
 
 
 ** ESP Blocked or Filtered
@@ -127,8 +124,7 @@ When there are multiple paths created using multiple Child SAs with
 identical Traffic Selectors as specified in [[RFC7296]], there is a
 need to probe each Child SA, including the network path,
 independently from an IPsec peer. Each SA may traverse different
-network paths and may have different policies. The Encrypted ESP Ping
-would specifically help determine the reachability of each path
+network paths and may have different policies. Encrypted ESP Ping determines the reachability of each path
 independently.
 
 
@@ -180,23 +176,20 @@ to explore multiple paths specifically
 
 ** Also Track Incoming Traffic for liveness check
 
-In addition to probing the outgoing paths, incoming traffic must also be monitored
-to get a complete picture of IPsec path health. Incoming per-SA byte and packet counters maintained by IPsec are
+Outgoing probes alone do not cover IPsec path health; incoming traffic must also be monitored. Incoming per-SA byte and packet counters maintained by IPsec are
 cryptographically verified: a counter can only increment if a valid
 authenticated ESP packet was received. These counters reliably
 indicate a viable path. This should be
 taken into account when probing IPsec paths. For example, when the
 crypto subsystem is overloaded, the responder may miss out on
-Encrypted ESP Ping responses. However, tracking the incoming traffic
-after the ping probe is sent would help applications to recognize the
-IPsec path is still viable.
+Encrypted ESP Ping responses. Tracking the incoming traffic after the ping probe is sent allows
+applications to confirm the IPsec path is still viable.
 
 
 * Protocol Specification
 
-In a typical use case, after completing an IPsec SA negotiation,
-[[RFC7296]], an IPsec peer wishing to verify the viability of the
-current network path for ESP packets MAY initiate an ESP Echo
+After an IPsec SA negotiation, [[RFC7296]], an IPsec peer wishing to
+verify the viability of the current network path for ESP packets MAY initiate an ESP Echo
 Request. The ESP Echo Request MUST be sent as an ESP packet using
 the established SA, receiving the same level of protection as any
 other traffic on that SA. It SHOULD use an SPI value previously
