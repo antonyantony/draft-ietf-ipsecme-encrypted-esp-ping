@@ -252,6 +252,19 @@ payload (Section 4.1) and the new Encrypted ESP Ping payload (Section
 4.2).
 
 
+** Traffic Selector and Security Policy Exemption
+
+Under standard [[RFC4301]] inbound processing, decrypted ESP packets
+are verified against the Security Policy Database (SPD) traffic
+selectors associated with the SA. Because Next Header 144
+(AGGFRAG_PAYLOAD) control messages---including all ESP Echo Request
+and Reply payloads defined in this document---are non-IP control
+messages without inner IP headers or traffic addresses, they MUST NOT
+be subjected to inbound SPD traffic selector verification. This
+exemption applies equally to Congestion Control payloads (Section
+4.1), Encrypted ESP Ping payloads (Section 4.2), and Unencrypted ESP
+Echo payloads (Section 4.3).
+
 ** Using Congestion Control Payload
 
 IP-TFS Congestion Control AGGFRAG_PAYLOAD Payload Format as specified
@@ -367,6 +380,32 @@ caused by any of the following:
 Senders SHOULD still attempt to establish standard ESP Security
 Associations if no alternative paths or protocols are available.
 
+
+Because unencrypted ESP Echo packets operate outside the context of a
+negotiated ESP SA, receivers MUST NOT require a dynamically negotiated
+Security Association to accept and process incoming packets with SPI
+values 7 and 8 (arriving over raw ESP protocol 51 or UDP/TCP
+encapsulation). Implementations MAY process these packets directly or
+MAY utilize static SADB entries (for example, configured with null
+encryption and null authentication) to maintain administrative,
+policy, or rate-limiting information for unencrypted probing.
+
+** Behavior under UDP and TCP Encapsulation
+
+There is no distinction between ESP Echo packets and other ESP packets
+for the purposes of processing encapsulation under [[RFC3948]] (UDP
+encapsulation) and [[RFC8229]] (TCP encapsulation).
+
+If an implementation is capable of receiving UDP or TCP encapsulated
+packets, it SHOULD accept encapsulated ESP packets with SPI values 7
+and 8 on either, without the negotiation of an SA.
+
+When TCP encapsulation is used [[RFC8229]], path MTU discovery is
+ineffective. Because TCP segments and reassembles stream traffic,
+packets exceeding the path MTU are segmented rather than dropped by
+network bottlenecks. Consequently, over TCP encapsulation, ESP Echo
+functions as an SA reachability and liveness check rather than an MTU
+discovery tool.
 
 * IKEv2 Notification
 
