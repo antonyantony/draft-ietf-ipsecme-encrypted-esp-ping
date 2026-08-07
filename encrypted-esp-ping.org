@@ -37,9 +37,12 @@ Maximum Transmission Unit (MTU) using Encapsulating Security Payload
 
 The protocol supports two modes of operation: an encrypted mode used
 over established IPsec Security Associations (SAs), with an option to
-specify a preferred return path when multiple SAs exist between the
-same set of peers, and an unencrypted mode used outside the context of
-a negotiated ESP SA.
+specify a preferred reply path when multiple SAs exist between the
+peers, and an unencrypted mode used outside the context of a
+negotiated ESP SA. In addition to bidirectional echo probing, the
+protocol supports sending one-way ESP packets without eliciting a
+reply, primarily for keepalives, NAT and firewall pinhole maintenance,
+and unidirectional link diagnostics.
 
 A peer can announce support for ESP Echo using a new IKEv2 Status
 Notification ESP_ECHO_SUPPORTED.
@@ -63,7 +66,7 @@ the second mode, peers negotiate ESP_ECHO_SUPPORTED via IKEv2, which
 uses a new payload format defined in this document and commits the
 peer to replying.
 
-The approach for specifying a preferred return path is inspired by
+The approach for specifying a preferred reply path is inspired by
 Return Path Specified LSP Ping [[RFC7110]].
 
 This document defines both unencrypted and encrypted ESP Echo modes.
@@ -468,14 +471,14 @@ Message Status Types" [[STATUSNOTIFY]].
 
 * Operational Considerations
 
-When an explicit return path is requested and the ESP Echo responder
-SHOULD make best effort to reply via this path, however, if local
-policies do not allow this reply via another SA.
+When an explicit reply path is requested, the ESP Echo responder
+SHOULD make best effort to reply via this path; however, if local
+policies do not allow this, it MAY reply via another SA.
 
 A typical implementation involves creating an ESP Echo socket, which
 allows setting an outgoing SPI during initialization, and matching
 source and destination address. Once socket is setup before sending
-any data, only write payload with optionally specifying return path.
+any data, only write payload with optionally specifying reply path.
 
 For unencrypted probing using SPIs 7 and 8, packet capture tools on
 security gateways can filter specifically for these SPI values to
