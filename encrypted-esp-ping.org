@@ -260,8 +260,8 @@ In both modes, an endpoint MAY send an ESP Echo Request to assess path
 reachability, discover path MTU, or maintain middlebox state.
 
 The ESP Next Header MUST be set to AGGFRAG_PAYLOAD (144) [[RFC9347]],
-carrying the ESP Echo payload format defined in Section 5.3, optional
-Echo Data, and padding.
+carrying the ESP Echo payload format defined in Section 5.3, including
+optional Data.
 
 When an incoming request has the Reply path flag set (R=1), the receiving
 peer SHOULD reply on the specified SPI using an ESP packet with Next
@@ -294,7 +294,7 @@ ESP packet with Next Header set to 144 (AGGFRAG_PAYLOAD).
 ** ESP Echo Payload Format
 
 The ESP Echo payload format consists of a fixed 12-octet header followed
-by optional Echo Data:
+by optional Data:
 
 #+caption: ESP Echo Payload Format
 #+name: echo-echo-payload
@@ -317,7 +317,7 @@ by optional Echo Data:
 - Reply path (R): 1-bit flag. Set to 1 to request an Echo Reply; set to 0
   when no reply is requested.
 - Reserved: 7 bits
-- Data Length: Length of following Data in octets (16 bits)
+- Data Length: Length of the following Data field in octets (16 bits)
 - Identifier: A 16-bit request identifier. The identifier SHOULD be set
   to a unique value to distinguish between different ESP Request
   sessions. The responder copies it from the request.
@@ -325,9 +325,9 @@ by optional Echo Data:
   request sent.
 - Reply path SPI: 32 bits. Specifies the target SPI for the reply when
   R=1; ignored when R=0.
-- Data: Optional variable-length data that follows the header. In an
-  Echo Reply, this data is copied from the request up to the reply path
-  MTU.
+- Data: Zero or more octets of arbitrary data that follows the header.
+  In an Echo Reply, this data is copied from the request up to the reply
+  path MTU.
 
 
 ** Reply Path Processing and Validation
@@ -381,9 +381,9 @@ The inner payload utilizes the same fixed format defined in Section
 Reply path flag (R=1) and sets the Reply path SPI field to 8
 (ESP-ECHO-REPLY). To send a one-way unencrypted probe without eliciting
 a reply, the sender sets R=0, and the Reply path SPI field is ignored by
-the receiver. Senders MAY include arbitrary data octets up to the path
-MTU to verify large packet transmission; when R=1, the responder SHOULD
-copy the request data up to the reply path MTU.
+the receiver. Senders MAY include arbitrary data in the Data field up to
+the path MTU to verify large packet transmission; when R=1, the responder
+SHOULD copy the request data up to the reply path MTU.
 
 When no reply is received, a sender MUST NOT conclude that the network
 path is unable to transmit ESP packets. The absence of a reply can be
