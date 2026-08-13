@@ -359,16 +359,22 @@ request message, it MUST copy up to the reply path MTU.
 An IPv4 or IPv6 node that desires to determine whether the path to a
 particular destination supports ESP packets outside the context of a
 negotiated ESP SA sends an unencrypted ESP Echo Request packet to that
-destination. In this mode, packets use the standard ESP format
-described in Section 2 of [[RFC4303]] with the following
-modifications:
+destination. In this mode, packets use the standard ESP packet format
+described in Section 2 of [[RFC4303]] with the NULL encryption algorithm
+[[RFC2410]] and no integrity protection (AUTH_NONE [[RFC7296]]):
 
 - The SPI field MUST be set to 7 (ESP-ECHO-REQUEST) for requests and 8
   (ESP-ECHO-REPLY) for replies.
-- The Next Header field MUST be set to 144 (AGGFRAG_PAYLOAD).
-- There is no Integrity Check Value (ICV) or cryptographic encryption
-  applied at the ESP layer. The ESP Sequence Number SHOULD be set to 0,
-  and replay protection MUST NOT be enabled.
+- The Next Header field in the ESP trailer MUST be set to 144
+  (AGGFRAG_PAYLOAD).
+- Under NULL encryption [[RFC2410]] and no integrity protection
+  ([[RFC4303]] Section 2.7), the Initialization Vector (IV) and
+  Integrity Check Value (ICV) fields are omitted (0 octets in length).
+- The ESP Sequence Number SHOULD be set to 0, and replay protection
+  MUST NOT be enabled.
+- The ESP trailer contains 0 to 3 octets of Padding as needed to align
+  the trailer to a 4-octet boundary [[RFC2410]], followed by a 1-octet
+  Pad Length and the 1-octet Next Header (144).
 
 The inner payload utilizes the same fixed format defined in Section
 5.3. When requesting an unencrypted Echo Reply, the sender sets the
@@ -399,9 +405,9 @@ negotiated ESP SA, receivers MUST NOT require a dynamically negotiated
 Security Association to accept and process incoming packets with SPI
 values 7 and 8 (arriving over raw ESP protocol 50 or UDP/TCP
 encapsulation). Implementations MAY process these packets directly or
-MAY utilize static SADB entries (for example, configured with null
-encryption and null authentication) to maintain administrative,
-policy, or rate-limiting information for unencrypted probing.
+MAY utilize static SADB entries configured with NULL encryption
+([[RFC2410]]) and no authentication to maintain administrative, policy,
+or rate-limiting information for unencrypted probing.
 
 ** Behavior under UDP and TCP Encapsulation
 
@@ -512,6 +518,7 @@ cryptographically authenticates all echo requests and replies.
 
 ** RFC0792
 ** RFC2119
+** RFC2410
 ** RFC2827
 ** RFC4301
 ** RFC4303
