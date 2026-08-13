@@ -383,7 +383,7 @@ path is unable to transmit ESP packets. The absence of a reply can be
 caused by any of the following:
 - The remote peer does not support the ESP Echo Protocol (or local
   policy chooses not to reply).
-- The network path does not support ESP packets (e.g., protocol 51 is
+- The network path does not support ESP packets (e.g., protocol 50 is
   dropped by intermediate middleboxes or firewalls).
 - Intermediate network nodes permit regular ESP traffic with
   operational negotiated SPIs, but drop ESP packets with reserved SPI
@@ -396,7 +396,7 @@ Associations if no alternative paths or protocols are available.
 Because unencrypted ESP Echo packets operate outside the context of a
 negotiated ESP SA, receivers MUST NOT require a dynamically negotiated
 Security Association to accept and process incoming packets with SPI
-values 7 and 8 (arriving over raw ESP protocol 51 or UDP/TCP
+values 7 and 8 (arriving over raw ESP protocol 50 or UDP/TCP
 encapsulation). Implementations MAY process these packets directly or
 MAY utilize static SADB entries (for example, configured with null
 encryption and null authentication) to maintain administrative,
