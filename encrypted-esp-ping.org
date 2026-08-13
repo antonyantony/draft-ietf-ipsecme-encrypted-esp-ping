@@ -329,6 +329,10 @@ by optional Data:
   In an Echo Reply, this data is copied from the request up to the reply
   path MTU.
 
+The ESP trailer MUST be constructed using the minimum allowable padding
+required by the cipher algorithm and [[RFC4303]]. In unencrypted mode
+([[RFC2410]]), the padding length MUST NOT exceed 3 octets.
+
 
 ** Reply Path Processing and Validation
 
