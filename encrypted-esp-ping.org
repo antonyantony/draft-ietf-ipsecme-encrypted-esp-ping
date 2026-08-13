@@ -367,7 +367,8 @@ modifications:
   (ESP-ECHO-REPLY) for replies.
 - The Next Header field MUST be set to 144 (AGGFRAG_PAYLOAD).
 - There is no Integrity Check Value (ICV) or cryptographic encryption
-  applied at the ESP layer, and the ESP sequence number is set to 0.
+  applied at the ESP layer. The ESP Sequence Number SHOULD be set to 0,
+  and replay protection MUST NOT be enabled.
 
 The inner payload utilizes the same fixed format defined in Section
 5.3. When requesting an unencrypted Echo Reply, the sender sets the
