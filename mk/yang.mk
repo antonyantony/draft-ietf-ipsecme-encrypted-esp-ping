@@ -95,6 +95,16 @@ idnits: $(VBASE).txt
 	if [ ! -e idnits ]; then curl -fLO 'http://tools.ietf.org/tools/idnits/idnits'; chmod 755 idnits; fi
 	./idnits --verbose $<
 
+.PHONY: iddiff
+iddiff: $(VBASE).txt
+	@mkdir -p draft
+	@pubversion="$$(curl -s https://datatracker.ietf.org/api/v1/doc/document/$(BASE)/ | sed -n 's/.*"rev": "\([0-9]*\)".*/\1/p')"; \
+	if [ -z "$$pubversion" ]; then echo "Could not determine last published version of $(BASE) on datatracker"; exit 1; fi; \
+	echo "Comparing editor's copy -$(VERSION) against published -$$pubversion"; \
+	curl -fLo draft/$(BASE)-$$pubversion-published.txt https://www.ietf.org/archive/id/$(BASE)-$$pubversion.txt; \
+	iddiff draft/$(BASE)-$$pubversion-published.txt $(VBASE).txt > draft/$(BASE)-diff-from-$$pubversion.html; \
+	echo "Diff written to draft/$(BASE)-diff-from-$$pubversion.html"
+
 # -----
 # Tools
 # -----
