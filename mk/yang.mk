@@ -10,7 +10,8 @@ PBASE := publish/$(BASE)-$(VERSION)
 VBASE := draft/$(BASE)-$(VERSION)
 LBASE := draft/$(BASE)-latest
 SHELL := /bin/bash
-MAIN_BRANCH ?= main #older repos set to master
+# older repos set to master
+MAIN_BRANCH ?= main
 PUSH_TO_REMOTE ?= origin
 
 # If you have docker you can avoid having to install anything by leaving this.
@@ -18,8 +19,6 @@ ifeq ($(CIRCLECI),)
 export DOCKRUN ?= docker run --user $(shell id -u) --network=host -v $$(pwd):/work labn/org-rfc
 endif
 EMACSCMD := $(DOCKRUN) emacs -Q --batch --debug-init --eval '(setq-default indent-tabs-mode nil)' --eval '(setq org-confirm-babel-evaluate nil)' -l ./ox-rfc.el
-
-BRANCH_EXISTS := $(shell git rev-parse --verify $(MAIN_BRANCH) 2>/dev/null)
 
 all: $(LBASE).xml $(LBASE).txt $(LBASE).html # $(LBASE).pdf
 
@@ -41,9 +40,7 @@ endif
 
 .PHONY: main-branch-check
 main-branch-check:
-ifeq ($(BRANCH_EXISTS),)
-    $(error Branch '$(MAIN_BRANCH)' does not exist. Exiting.)
-endif
+	@git rev-parse --verify $(MAIN_BRANCH) >/dev/null 2>&1 || { echo "Branch '$(MAIN_BRANCH)' does not exist. Exiting."; exit 1; }
 
 .PHONY: publish
 publish: main-branch-check git-clean-check $(VBASE).xml $(VBASE).txt $(VBASE).html
