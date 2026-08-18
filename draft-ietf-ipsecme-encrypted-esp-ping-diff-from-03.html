@@ -1,0 +1,563 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Diff: draft-ietf-ipsecme-encrypted-esp-ping-03-published.txt - draft-ietf-ipsecme-encrypted-esp-ping-04.txt</title>
+    <style>
+      body {font-family: monospace}
+      table {
+        border-spacing: 0;
+      }
+      td {
+        padding: 0;
+        white-space: pre;
+        vertical-align: top;
+        font-size: 0.86em;
+      }
+      th {
+        padding: 0;
+        text-align: center;
+      }
+      .left { background-color: #EEE; }
+      .right { background-color: #FFF; }
+      .lblock { background-color: #BFB; }
+      .rblock { background-color: #FF8; }
+      .delete { background-color: #ACF; }
+      .insert { background-color: #8FF; }
+      .change { background-color: gray; }
+      .header { background-color: orange; }
+      .w-delete {
+        color: #F00;
+        text-decoration: line-through;
+      }
+      .w-insert {
+        color: #008000;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <table>
+      <tbody>
+        <tr>
+          <td>&nbsp;</td>
+          <th class="header" scope="col">draft-ietf-ipsecme-encrypted-esp-ping-03-published.txt</th>
+          <td>&nbsp;</td>
+          <th class="header" scope="col">draft-ietf-ipsecme-encrypted-esp-ping-04.txt</th>
+        </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">
+</td>
+        <td>&nbsp;</td>
+        <td class="right">
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">
+</td>
+        <td>&nbsp;</td>
+        <td class="right">
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">
+</td>
+        <td>&nbsp;</td>
+        <td class="right">
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">
+</td>
+        <td>&nbsp;</td>
+        <td class="right">
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">IP Security Maintenance and Extensions                         A. Antony
+</td>
+        <td>&nbsp;</td>
+        <td class="right">IP Security Maintenance and Extensions                         A. Antony
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">Internet-Draft                                               S. Klassert
+</td>
+        <td>&nbsp;</td>
+        <td class="right">Internet-Draft                                               S. Klassert
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">Updates: 9347 (if approved)                                      secunet
+</td>
+        <td>&nbsp;</td>
+        <td class="right">Updates: 9347 (if approved)                                      secunet
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="lblock">Intended status: Standards Track                          <span class="delete">    4 May</span> 2026
+</td>
+        <td>&nbsp;</td>
+        <td class="rblock">Intended status: Standards Track                          <span class="insert">18 August</span> 2026
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="lblock"><span class="delete">Expires: 5 November 2026
+</span></td>
+        <td>&nbsp;</td>
+        <td class="rblock"><span class="insert">Expires: 19 February 2027
+</span></td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">
+</td>
+        <td>&nbsp;</td>
+        <td class="right">
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">
+</td>
+        <td>&nbsp;</td>
+        <td class="right">
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">                      Encrypted ESP Echo Protocol
+</td>
+        <td>&nbsp;</td>
+        <td class="right">                      Encrypted ESP Echo Protocol
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="lblock">                draft-ietf-ipsecme-encrypted-esp-ping-0<span class="delete">3</span>
+</td>
+        <td>&nbsp;</td>
+        <td class="rblock">                draft-ietf-ipsecme-encrypted-esp-ping-0<span class="insert">4</span>
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">
+</td>
+        <td>&nbsp;</td>
+        <td class="right">
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">Abstract
+</td>
+        <td>&nbsp;</td>
+        <td class="right">Abstract
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">
+</td>
+        <td>&nbsp;</td>
+        <td class="right">
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">
+</td>
+        <td>&nbsp;</td>
+        <td class="right">
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">   This document defines the Encrypted ESP Echo Function, a mechanism to
+</td>
+        <td>&nbsp;</td>
+        <td class="right">   This document defines the Encrypted ESP Echo Function, a mechanism to
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">   assess the reachability of IP Security (IPsec) network paths using
+</td>
+        <td>&nbsp;</td>
+        <td class="right">   assess the reachability of IP Security (IPsec) network paths using
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">   Encapsulating Security Payload (ESP) packets.  It detects end-to-end
+</td>
+        <td>&nbsp;</td>
+        <td class="right">   Encapsulating Security Payload (ESP) packets.  It detects end-to-end
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">   path status by exchanging only encrypted ESP packets between IPsec
+</td>
+        <td>&nbsp;</td>
+        <td class="right">   path status by exchanging only encrypted ESP packets between IPsec
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="right">&nbsp;</td>
+      </tr>
+      <tr id="context-0">
+        <td></td>
+        <th class="change" scope="col">
+          <a href="#context-0">
+           <small>Skipping</small>
+          </a>
+        </th>
+        <td></td>
+        <th class="change" scope="col">
+          <a href="#context-0">
+           <small>Skipping</small>
+          </a>
+        </th>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">   working documents as Internet-Drafts.  The list of current Internet-
+</td>
+        <td>&nbsp;</td>
+        <td class="right">   working documents as Internet-Drafts.  The list of current Internet-
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">   Drafts is at https://datatracker.ietf.org/drafts/current/.
+</td>
+        <td>&nbsp;</td>
+        <td class="right">   Drafts is at https://datatracker.ietf.org/drafts/current/.
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">
+</td>
+        <td>&nbsp;</td>
+        <td class="right">
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">   Internet-Drafts are draft documents valid for a maximum of six months
+</td>
+        <td>&nbsp;</td>
+        <td class="right">   Internet-Drafts are draft documents valid for a maximum of six months
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">   and may be updated, replaced, or obsoleted by other documents at any
+</td>
+        <td>&nbsp;</td>
+        <td class="right">   and may be updated, replaced, or obsoleted by other documents at any
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">   time.  It is inappropriate to use Internet-Drafts as reference
+</td>
+        <td>&nbsp;</td>
+        <td class="right">   time.  It is inappropriate to use Internet-Drafts as reference
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">   material or to cite them other than as &quot;work in progress.&quot;
+</td>
+        <td>&nbsp;</td>
+        <td class="right">   material or to cite them other than as &quot;work in progress.&quot;
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">
+</td>
+        <td>&nbsp;</td>
+        <td class="right">
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="lblock">   This Internet-Draft will expire on <span class="delete">5 Nov</span>e<span class="delete">m</span>b<span class="delete">e</span>r 202<span class="delete">6</span>.
+</td>
+        <td>&nbsp;</td>
+        <td class="rblock">   This Internet-Draft will expire on <span class="insert">19 F</span>ebr<span class="insert">uary</span> 202<span class="insert">7</span>.
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">
+</td>
+        <td>&nbsp;</td>
+        <td class="right">
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">Copyright Notice
+</td>
+        <td>&nbsp;</td>
+        <td class="right">Copyright Notice
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">
+</td>
+        <td>&nbsp;</td>
+        <td class="right">
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">   Copyright (c) 2026 IETF Trust and the persons identified as the
+</td>
+        <td>&nbsp;</td>
+        <td class="right">   Copyright (c) 2026 IETF Trust and the persons identified as the
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">   document authors.  All rights reserved.
+</td>
+        <td>&nbsp;</td>
+        <td class="right">   document authors.  All rights reserved.
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">   This document is subject to BCP 78 and the IETF Trust&#x27;s Legal
+</td>
+        <td>&nbsp;</td>
+        <td class="right">   This document is subject to BCP 78 and the IETF Trust&#x27;s Legal
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+</td>
+        <td>&nbsp;</td>
+        <td class="right">   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">   license-info) in effect on the date of publication of this document.
+</td>
+        <td>&nbsp;</td>
+        <td class="right">   license-info) in effect on the date of publication of this document.
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="right">&nbsp;</td>
+      </tr>
+      <tr id="context-1">
+        <td></td>
+        <th class="change" scope="col">
+          <a href="#context-1">
+           <small>Skipping</small>
+          </a>
+        </th>
+        <td></td>
+        <th class="change" scope="col">
+          <a href="#context-1">
+           <small>Skipping</small>
+          </a>
+        </th>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">   [I-D.ietf-ipsecme-esp-ping]
+</td>
+        <td>&nbsp;</td>
+        <td class="right">   [I-D.ietf-ipsecme-esp-ping]
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">              Colitti, L., Linkova, J., and M. Richardson, &quot;ESP Echo
+</td>
+        <td>&nbsp;</td>
+        <td class="right">              Colitti, L., Linkova, J., and M. Richardson, &quot;ESP Echo
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">              Protocol&quot;, Work in Progress, Internet-Draft, draft-ietf-
+</td>
+        <td>&nbsp;</td>
+        <td class="right">              Protocol&quot;, Work in Progress, Internet-Draft, draft-ietf-
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">              ipsecme-esp-ping-01, 1 March 2026,
+</td>
+        <td>&nbsp;</td>
+        <td class="right">              ipsecme-esp-ping-01, 1 March 2026,
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">              &lt;https://datatracker.ietf.org/doc/html/draft-ietf-ipsecme-
+</td>
+        <td>&nbsp;</td>
+        <td class="right">              &lt;https://datatracker.ietf.org/doc/html/draft-ietf-ipsecme-
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">              esp-ping-01&gt;.
+</td>
+        <td>&nbsp;</td>
+        <td class="right">              esp-ping-01&gt;.
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">
+</td>
+        <td>&nbsp;</td>
+        <td class="right">
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">   [I-D.ietf-ipsecme-ikev2-reliable-transport]
+</td>
+        <td>&nbsp;</td>
+        <td class="right">   [I-D.ietf-ipsecme-ikev2-reliable-transport]
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="lblock">              Smyslov, V. and T. Reddy, &quot;Separate Transports for IKE<span class="delete"> and</span>
+</td>
+        <td>&nbsp;</td>
+        <td class="rblock">              Smyslov, V. and T. Reddy<span class="insert">.K</span>, &quot;Separate Transports for IKE
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="lblock">              ESP&quot;, Work in Progress, Internet-Draft, draft-ietf-
+</td>
+        <td>&nbsp;</td>
+        <td class="rblock">             <span class="insert"> and</span> ESP&quot;, Work in Progress, Internet-Draft, draft-ietf-
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="lblock">              ipsecme-ikev2-reliable-transport-0<span class="delete">2</span>, 1<span class="delete">8</span> A<span class="delete">pril</span> 2026,
+</td>
+        <td>&nbsp;</td>
+        <td class="rblock">              ipsecme-ikev2-reliable-transport-0<span class="insert">7</span>, 1<span class="insert">0</span> A<span class="insert">ugust</span> 2026,
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">              &lt;https://datatracker.ietf.org/doc/html/draft-ietf-ipsecme-
+</td>
+        <td>&nbsp;</td>
+        <td class="right">              &lt;https://datatracker.ietf.org/doc/html/draft-ietf-ipsecme-
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="lblock">              ikev2-reliable-transport-0<span class="delete">2</span>&gt;.
+</td>
+        <td>&nbsp;</td>
+        <td class="rblock">              ikev2-reliable-transport-0<span class="insert">7</span>&gt;.
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">
+</td>
+        <td>&nbsp;</td>
+        <td class="right">
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">   [RFC7110]  Chen, M., Cao, W., Ning, S., Jounay, F., and S. Delord,
+</td>
+        <td>&nbsp;</td>
+        <td class="right">   [RFC7110]  Chen, M., Cao, W., Ning, S., Jounay, F., and S. Delord,
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">              &quot;Return Path Specified Label Switched Path (LSP) Ping&quot;,
+</td>
+        <td>&nbsp;</td>
+        <td class="right">              &quot;Return Path Specified Label Switched Path (LSP) Ping&quot;,
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">              RFC 7110, DOI 10.17487/RFC7110, January 2014,
+</td>
+        <td>&nbsp;</td>
+        <td class="right">              RFC 7110, DOI 10.17487/RFC7110, January 2014,
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">              &lt;https://www.rfc-editor.org/info/rfc7110&gt;.
+</td>
+        <td>&nbsp;</td>
+        <td class="right">              &lt;https://www.rfc-editor.org/info/rfc7110&gt;.
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">
+</td>
+        <td>&nbsp;</td>
+        <td class="right">
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">Appendix A.  Additional Stuff
+</td>
+        <td>&nbsp;</td>
+        <td class="right">Appendix A.  Additional Stuff
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">
+</td>
+        <td>&nbsp;</td>
+        <td class="right">
+</td>
+      </tr>
+      </tbody>
+    </table></body>
+</html>

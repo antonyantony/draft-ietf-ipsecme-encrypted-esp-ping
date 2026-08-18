@@ -5,8 +5,8 @@
 IP Security Maintenance and Extensions                         A. Antony
 Internet-Draft                                               S. Klassert
 Updates: 9347 (if approved)                                      secunet
-Intended status: Standards Track                              4 May 2026
-Expires: 5 November 2026
+Intended status: Standards Track                          18 August 2026
+Expires: 19 February 2027
 
 
                       Encrypted ESP Echo Protocol
@@ -42,7 +42,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 5 November 2026.
+   This Internet-Draft will expire on 19 February 2027.
 
 Copyright Notice
 
@@ -53,9 +53,9 @@ Copyright Notice
 
 
 
-Antony & Klassert        Expires 5 November 2026                [Page 1]
+Antony & Klassert       Expires 19 February 2027                [Page 1]
 
-Internet-Draft             Encrypted Esp Ping                   May 2026
+Internet-Draft             Encrypted Esp Ping                August 2026
 
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -109,9 +109,9 @@ Table of Contents
 
 
 
-Antony & Klassert        Expires 5 November 2026                [Page 2]
+Antony & Klassert       Expires 19 February 2027                [Page 2]
 
-Internet-Draft             Encrypted Esp Ping                   May 2026
+Internet-Draft             Encrypted Esp Ping                August 2026
 
 
    Encrypted ESP Ping supports two modes of operation.  In the first
@@ -165,9 +165,9 @@ Internet-Draft             Encrypted Esp Ping                   May 2026
 
 
 
-Antony & Klassert        Expires 5 November 2026                [Page 3]
+Antony & Klassert       Expires 19 February 2027                [Page 3]
 
-Internet-Draft             Encrypted Esp Ping                   May 2026
+Internet-Draft             Encrypted Esp Ping                August 2026
 
 
 3.1.  ESP Blocked or Filtered
@@ -221,9 +221,9 @@ Internet-Draft             Encrypted Esp Ping                   May 2026
 
 
 
-Antony & Klassert        Expires 5 November 2026                [Page 4]
+Antony & Klassert       Expires 19 February 2027                [Page 4]
 
-Internet-Draft             Encrypted Esp Ping                   May 2026
+Internet-Draft             Encrypted Esp Ping                August 2026
 
 
    responder SHOULD try to respond via that IPsec SA.  However, the
@@ -277,9 +277,9 @@ Internet-Draft             Encrypted Esp Ping                   May 2026
 
 
 
-Antony & Klassert        Expires 5 November 2026                [Page 5]
+Antony & Klassert       Expires 19 February 2027                [Page 5]
 
-Internet-Draft             Encrypted Esp Ping                   May 2026
+Internet-Draft             Encrypted Esp Ping                August 2026
 
 
 4.  Protocol Specification
@@ -333,9 +333,9 @@ Internet-Draft             Encrypted Esp Ping                   May 2026
 
 
 
-Antony & Klassert        Expires 5 November 2026                [Page 6]
+Antony & Klassert       Expires 19 February 2027                [Page 6]
 
-Internet-Draft             Encrypted Esp Ping                   May 2026
+Internet-Draft             Encrypted Esp Ping                August 2026
 
 
    on busy paths.  When there is no response, instead of concluding that
@@ -389,9 +389,9 @@ Internet-Draft             Encrypted Esp Ping                   May 2026
 
 
 
-Antony & Klassert        Expires 5 November 2026                [Page 7]
+Antony & Klassert       Expires 19 February 2027                [Page 7]
 
-Internet-Draft             Encrypted Esp Ping                   May 2026
+Internet-Draft             Encrypted Esp Ping                August 2026
 
 
 4.3.  Return Path Validation
@@ -445,9 +445,9 @@ Internet-Draft             Encrypted Esp Ping                   May 2026
 
 
 
-Antony & Klassert        Expires 5 November 2026                [Page 8]
+Antony & Klassert       Expires 19 February 2027                [Page 8]
 
-Internet-Draft             Encrypted Esp Ping                   May 2026
+Internet-Draft             Encrypted Esp Ping                August 2026
 
 
 7.  Operational Considerations
@@ -501,9 +501,9 @@ Internet-Draft             Encrypted Esp Ping                   May 2026
 
 
 
-Antony & Klassert        Expires 5 November 2026                [Page 9]
+Antony & Klassert       Expires 19 February 2027                [Page 9]
 
-Internet-Draft             Encrypted Esp Ping                   May 2026
+Internet-Draft             Encrypted Esp Ping                August 2026
 
 
    [RFC7296]  Kaufman, C., Hoffman, P., Nir, Y., Eronen, P., and T.
@@ -536,11 +536,11 @@ Internet-Draft             Encrypted Esp Ping                   May 2026
               esp-ping-01>.
 
    [I-D.ietf-ipsecme-ikev2-reliable-transport]
-              Smyslov, V. and T. Reddy, "Separate Transports for IKE and
-              ESP", Work in Progress, Internet-Draft, draft-ietf-
-              ipsecme-ikev2-reliable-transport-02, 18 April 2026,
+              Smyslov, V. and T. Reddy.K, "Separate Transports for IKE
+              and ESP", Work in Progress, Internet-Draft, draft-ietf-
+              ipsecme-ikev2-reliable-transport-07, 10 August 2026,
               <https://datatracker.ietf.org/doc/html/draft-ietf-ipsecme-
-              ikev2-reliable-transport-02>.
+              ikev2-reliable-transport-07>.
 
    [RFC7110]  Chen, M., Cao, W., Ning, S., Jounay, F., and S. Delord,
               "Return Path Specified Label Switched Path (LSP) Ping",
@@ -557,9 +557,9 @@ Authors' Addresses
 
 
 
-Antony & Klassert        Expires 5 November 2026               [Page 10]
+Antony & Klassert       Expires 19 February 2027               [Page 10]
 
-Internet-Draft             Encrypted Esp Ping                   May 2026
+Internet-Draft             Encrypted Esp Ping                August 2026
 
 
    Antony Antony
@@ -613,4 +613,4 @@ Internet-Draft             Encrypted Esp Ping                   May 2026
 
 
 
-Antony & Klassert        Expires 5 November 2026               [Page 11]
+Antony & Klassert       Expires 19 February 2027               [Page 11]
