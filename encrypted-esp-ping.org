@@ -10,62 +10,73 @@
 #+RFC_STREAM: IETF
 #+RFC_XML_VERSION: 3
 #+RFC_CONSENSUS: true
-#+RFC_UPDATES: 9347
+#+RFC_UPDATES: 4303, 9347
 
-#+TITLE: Encrypted ESP Echo Protocol
-#+RFC_SHORT_TITLE: Encrypted Esp Ping
+#+TITLE: ESP Echo Protocol
+#+RFC_SHORT_TITLE: ESP Ping
 #+AUTHOR: Antony Antony
 #+EMAIL: antony.antony@secunet.com
 #+AFFILIATION: secunet Security Networks AG
 #+RFC_SHORT_ORG: secunet
 #+RFC_ADD_AUTHOR: ("Steffen Klassert" "steffen.klassert@secunet.com" ("secunet" "secunet Security Networks AG"))
+#+RFC_ADD_AUTHOR: ("Lorenzo Colitti" "lorenzo@google.com" ("Google" "Google"))
+#+RFC_ADD_AUTHOR: ("Jen Linkova" "furry@google.com" ("Google" "Google"))
+#+RFC_ADD_AUTHOR: ("Michael Richardson" "mcr+ietf@sandelman.ca" ("Sandelman" "Sandelman Software Works"))
+#+RFC_ADD_AUTHOR: ("Nathan Harold" "nharold@google.com" ("Google" "Google"))
 #+RFC_AREA: Internet
 #+RFC_WORKGROUP: IP Security Maintenance and Extensions
 
 #+begin_abstract
 
-This document defines the Encrypted ESP Echo Function, a mechanism
-to assess the reachability of IP Security (IPsec) network
-paths using Encapsulating Security Payload (ESP) packets. It detects
-end-to-end path status by exchanging only encrypted ESP packets between
-IPsec peers. The Encrypted Echo message can either use existing
-congestion control payloads from RFC9347 or a new message format
-defined here, with an option to specify a preferred return path when
-there is more than one pair of IPsec SAs between the same set of
-IPsec peers.
+This document defines the ESP Echo Protocol, an extension to the ESP
+AGGFRAG protocol [[RFC9347]] that provides an Echo Request and Echo
+Reply mechanism for IP Security (IPsec) link diagnostics. It enables
+endpoints to assess end-to-end path reachability and discover path
+Maximum Transmission Unit (MTU) using Encapsulating Security Payload
+(ESP) packets.
 
-A peer can announce support using a new IKEv2 Status Notification
-ENCRYPTED_PING_SUPPORTED.
+The protocol supports two modes of operation: an encrypted mode used
+over established IPsec Security Associations (SAs), with an option to
+specify a preferred reply path when multiple SAs exist between the
+peers, and an unencrypted mode used outside the context of a
+negotiated ESP SA. In addition to bidirectional echo probing, the
+protocol supports sending one-way ESP packets without eliciting a
+reply, primarily for keepalives, NAT and firewall pinhole maintenance,
+and unidirectional link diagnostics.
+
+A peer can announce support for ESP Echo using a new IKEv2 Status
+Notification ESP_ECHO_SUPPORTED.
 
 #+end_abstract
 #+RFC_KEYWORDS: ("IPsec" "ESP" "Ping")
 
 * Introduction
 
-In response to the operational need for a data-plane
-failure-detection mechanism for IP Security (IPsec) Encapsulating
-Security Payload (ESP) from [[RFC4303]], this document introduces
-Encrypted ESP Ping, including the Echo Request and Response.
-This protocol assesses network path reachability dynamically and can
-optionally specify a return path for echo Reply messages.
+In response to the operational need for a data-plane failure-detection
+mechanism for IP Security (IPsec) Encapsulating Security Payload (ESP)
+from [[RFC4303]], this document introduces the ESP Echo Protocol,
+including Echo Request and Echo Reply messages. This protocol assesses
+network path reachability dynamically and can optionally specify a
+reply path for Echo Reply messages. Initiators can also send one-way
+probes without eliciting replies (e.g., for keepalives and NAT state
+maintenance) by clearing the Reply path flag.
 
-Encrypted ESP Ping supports two modes of operation. In the first
-mode, peers that have negotiated USE_AGGFRAG [[RFC9347]] can use the
-existing Congestion Control payload for echo requests and responses.
-In the second mode, peers negotiate ENCRYPTED_PING_SUPPORTED via
-IKEv2, which uses a new payload format defined in this document and
-commits the peer to responding.
-
-The approach for specifying a preferred return path is inspired by
+The approach for specifying a preferred reply path is inspired by
 Return Path Specified LSP Ping [[RFC7110]].
 
-This document covers only Encrypted ESP Ping, typically used after
-an IKE negotiation, while [[I-D.ietf-ipsecme-esp-ping]] specifies
-an unauthenticated ESP Ping to be used before IKE negotiation.
+This document defines both unencrypted and encrypted ESP Echo modes.
+The unencrypted mode is used outside the context of a negotiated ESP
+SA (for example, during MOBIKE [[RFC4555]] address exploration or for
+credential-free diagnostics), using fixed SPI values (7 and 8) without
+encryption. The encrypted mode is used within the context of an
+established ESP SA using unique negotiated SPIs. In both modes,
+packets use Next Header 144 (AGGFRAG_PAYLOAD).
 
 This document updates [[RFC9347]] by defining new AGGFRAG_PAYLOAD
-sub-types for ESP Echo Request and Response, which may be used under
-ENCRYPTED_PING_SUPPORTED negotiation without requiring USE_AGGFRAG.
+sub-types for ESP Echo Request and Reply, which operate independently
+of IP-TFS aggregation and do not require USE_AGGFRAG negotiation. This
+document also updates Section 2.1 of [[RFC4303]] by defining the fixed
+SPI values 7 and 8 for unencrypted ESP Echo packets.
 
 
 ** Terminology
@@ -74,8 +85,13 @@ This document uses the following terms defined in [[RFC4301]]:
 Encapsulating Security Payload (ESP), Security Association (SA),
 Security Policy Database (SPD).
 
-This document uses the following terms defined in [[RFC9347]]:
-AGGFRAG tunnel.
+This document uses the following terms defined in [[RFC9347]]: AGGFRAG
+tunnel, AGGFRAG_PAYLOAD.
+
+This document uses the term MOBIKE as defined in [[RFC4555]]. In
+accordance with ICMP [[RFC0792]], messages sent to elicit an echo
+response are termed "Echo Request", and the corresponding reply
+messages are termed "Echo Reply".
 
 
 * Requirements Language
@@ -83,15 +99,35 @@ AGGFRAG tunnel.
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
 "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
 "OPTIONAL" in this document are to be interpreted as described in BCP
-14 [[RFC2119]] [[RFC8174]]when, and only when, they appear in all
+14 [[RFC2119]] [[RFC8174]] when, and only when, they appear in all
 capitals, as shown here.
 
 
-* Use cases
+* Use Cases
 
-Diagnosing operational problems in IPsec can be challenging.
-Encrypted ESP Echo addresses these challenges; Encrypted ESP Ping is
-one such tool.
+Diagnosing operational problems in IPsec can be challenging. The ESP
+Echo Protocol addresses these challenges.
+
+
+** Initial and Mobility Path Discovery
+
+Prior to establishing an ESP SA, a node can verify whether the
+intermediate network permits ESP packets by sending an unencrypted ESP
+Echo Request. Depending on whether an ESP Echo Reply is received, the
+node can choose to enable UDP encapsulation, use a different IP
+protocol, or select an alternative server or interface. When using
+MOBIKE [[RFC4555]], a node can verify ESP reachability to a new
+candidate address before migrating the session, avoiding blackholing
+traffic.
+
+
+** Credential-Free Operator Troubleshooting
+
+Network operators can troubleshoot path reachability and MTU without
+requiring VPN or cryptographic credentials by sending unencrypted ESP
+Echo Requests. This allows enterprise support personnel to debug
+connectivity for guests independently, and enables operators to report
+path issues to transit ISPs along the routing path.
 
 
 ** ESP Blocked or Filtered
@@ -103,148 +139,164 @@ encapsulated in UDP (i.e., using the ESP protocol), successful IKE
 negotiation may occur, but ESP packets might fail to reach the peer
 due to differences in the packet path or filtering policies compared
 to IKE packets (e.g., UDP is allowed while ESP is filtered, typically
-due to misconfiguration). When using UDP encapsulation,
-ESP packets may encounter different filtering policies. This is
-typically due to broken packet filtering. Although this is less
-likely, it is still possible and can be difficult to diagnose.
-Operational experience suggests that networks and some home routers
-that drop ESP packets are common enough to cause problems for general-
-purpose VPN applications that require reliable performance on the
-Internet. Encrypted ESP Ping would greatly assist in diagnosing these
-scenarios. When IKEv2 operates over TCP to accommodate
-large post-quantum key exchanges while ESP may use a separate network
-path, Encrypted ESP Ping can verify ESP reachability
-independently of the IKEv2 control channel
-[[I-D.ietf-ipsecme-ikev2-reliable-transport]].
+due to misconfiguration). When using UDP encapsulation, intermediate
+middleboxes may apply different filtering policies to UDP-encapsulated
+ESP versus standard UDP traffic. Operational experience suggests that
+networks and some home routers that drop ESP packets are common enough
+to cause problems for general-purpose VPN applications that require
+reliable performance on the Internet. ESP Echo assists in diagnosing
+these scenarios. When IKEv2 operates over TCP to accommodate large
+post-quantum key exchanges while ESP may use a separate network path,
+ESP Echo can verify ESP reachability independently of the IKEv2
+control channel [[I-D.ietf-ipsecme-ikev2-reliable-transport]].
 
 
 ** Probing Multiple Paths
 
 When there are multiple paths created using multiple Child SAs with
 identical Traffic Selectors as specified in [[RFC7296]], there is a
-need to probe each Child SA, including the network path,
-independently from an IPsec peer. Each SA may traverse different
-network paths and may have different policies. Encrypted ESP Ping determines the reachability of each path
-independently.
+need to probe each Child SA, including the network path, independently
+from an IPsec peer. Each SA may traverse different network paths and
+may have different policies. ESP Echo determines the
+reachability of each path independently.
 
 
-** Probe Return Path
+** Probe Reply Path
 
-IPsec Security Associations (SAs) are negotiated as a pair,
-consisting of two unidirectional SAs in one exchange. IKEv2
-[[RFC7296]] Section 2.9 allows installing multiple Child SAs with
-identical Traffic Selectors. When there are multiple paths, the
-Encrypted ESP Ping SHOULD support requesting an echo response via a
-specific return path IPsec SA. To request a return path, additional
-attributes are necessary. The initiator would propose a specific SPI as
-the preferred return path. A specific return path SPI is necessary
-when to probe a specific path among multiple possible SAs between
-same peer. Multiple paths can exist for various reasons, such as a
-primary and secondary path scenario. For example over a satellite link and over fiber, the
-receiving peer may have a policy to respond via the fiber path even
-when the request arrives via the satellite link. If the initiator
-requests a return path, the responder SHOULD try to respond via that
-IPsec SA. However, the final decision is up to the responder.
-If the responder decides to send the response via a different path
-than the requested return path, the initiator SHOULD detect this
-mismatch and report it, e.g., via a status code to the requesting, local, process.
+IPsec Security Associations (SAs) are negotiated as a pair of
+unidirectional SAs. When an initiator sends an ESP Echo Request to
+elicit a reply, it sets the Reply path flag (R=1) and explicitly
+specifies the target Reply path SPI on which the peer is to transmit
+the Echo Reply.
 
+This explicit specification enables probing across multi-SA
+deployments, such as multiple Child SAs with identical Traffic
+Selectors ([[RFC7296]] Section 2.9), per-CPU SAs, or primary and
+secondary paths.
 
-** Manually Probing a Constant Rate on the AGGFRAG Tunnel
+The responder SHOULD reply via the specified IPsec SA, though the final
+choice remains subject to local policy. If the responder sends the reply
+via a different path, the initiator can detect this mismatch and report
+it.
 
-AGGFRAG probes, whether sent at a constant or variable rate, can
-derive reachability information for the IPsec SA, similar to
-Encrypted ESP Ping. Since the probes are sent over an IPsec tunnel,
-the reachability information is reliable. IP Traffic Flow Security
-(IP-TFS) [[RFC9347]] uses AGGFRAG at a constant rate; an Encrypted
-ESP Ping application may also send AGGFRAG payloads for manual
-diagnostic purposes.
+Conversely, clearing the Reply path flag (R=0) allows initiators to send
+one-way ESP packets without eliciting replies, enabling lightweight
+keepalives, NAT and firewall pinhole maintenance, and cryptographic
+sequence advancement without return traffic.
 
 
-** Why Not Use Existing IP Tools
+** Limitations of Existing IP-Layer Tools
 
-Existing tools such as ICMP ping or traceroute assume IP
-connectivity. However, in IPsec gateway setups, the gateway itself
-may not have an IP address that matches the IPsec Security Policy
-Database (SPD). A peer MUST accept Encrypted ESP Ping messages even
-when it does not math a local SPD.
+Existing tools such as ICMP ping or traceroute assume IP connectivity.
+However, in IPsec gateway setups, the gateway itself may not have an
+IP address that matches the IPsec Security Policy Database (SPD). A
+peer MUST accept ESP Echo messages even when it does not
+match a local SPD.
 
-In the case of multiple SAs as mentioned above, IP
-tools would find it hard, if not impossible, to generate IP traffic
-to explore multiple paths specifically
+Standard IP diagnostic tools cannot target specific IPsec SAs when
+exploring multiple paths between the same endpoints.
 
 
-** Also Track Incoming Traffic for liveness check
+** Inbound Traffic Monitoring for Liveness
 
-Outgoing probes alone do not cover IPsec path health; incoming traffic must also be monitored. Incoming per-SA byte and packet counters maintained by IPsec are
-cryptographically verified: a counter can only increment if a valid
-authenticated ESP packet was received. These counters reliably
-indicate a viable path. This should be
-taken into account when probing IPsec paths. For example, when the
-crypto subsystem is overloaded, the responder may miss out on
-Encrypted ESP Ping responses. Tracking the incoming traffic after the ping probe is sent allows
-applications to confirm the IPsec path is still viable.
+Outgoing probes alone do not cover IPsec path health; incoming traffic
+must also be monitored. Incoming per-SA byte and packet counters
+maintained by IPsec are cryptographically verified: a counter can only
+increment if a valid authenticated ESP packet was received. These
+counters reliably indicate a viable path. This should be taken into
+account when probing IPsec paths. For example, when the crypto
+subsystem is overloaded, the responder may miss out on ESP Echo
+replies. Tracking the incoming traffic after the ping probe is
+sent allows applications to confirm the IPsec path is still viable.
+
+
+* Relationship with RFC 9347
+
+IP Traffic Flow Security (IP-TFS) [[RFC9347]] utilizes Next Header 144
+(AGGFRAG_PAYLOAD) and defines a Congestion Control payload (sub-type 1)
+to measure round-trip time and packet loss within an active IP-TFS
+tunnel. The ESP Echo Protocol defined in this document also uses Next
+Header 144, defining dedicated Echo Request and Reply sub-types
+(sub-types [TBD2] and [TBD3]). The ESP Echo Protocol can be deployed in
+addition to active IP-TFS tunnels, or used independently across standard
+ESP SAs and unencrypted links.
+
+To determine which mechanism to use:
+
+- *When either can be used*: For basic link reachability checks and
+  round-trip time measurement over an established, active IP-TFS tunnel
+  ([[RFC9347]]), either mechanism can be used. When using RFC 9347
+  Congestion Control payloads specifically as echo probes, they MUST be
+  sent as independent ESP frames without concatenating other IPv4 or
+  IPv6 data blocks.
+- *When to use RFC 9347 Congestion Control*: Use Congestion Control
+  payloads when operating an active IP-TFS tunnel to provide real-time
+  loss and delay feedback for IP-TFS rate adaptation algorithms.
+- *When to use ESP Echo*: Use the ESP Echo Protocol when verifying
+  reachability, liveness, or Path MTU on standard (non-IP-TFS) ESP SAs;
+  when probing specific return paths across multiple SAs; when sending
+  unidirectional keepalives or maintaining NAT state without eliciting
+  replies (R=0); or when probing unencrypted paths prior to SA
+  negotiation (SPI 7 and 8).
+
+Unlike normal IP-TFS operation where Congestion Control payloads are
+multiplexed directly into the aggregation stream, ESP Echo packets are
+always transmitted as standalone ESP control frames and MUST NOT be
+aggregated or fragmented with user data.
 
 
 * Protocol Specification
 
-After an IPsec SA negotiation, [[RFC7296]], an IPsec peer wishing to
-verify the viability of the current network path for ESP packets MAY initiate an ESP Echo
-Request. The ESP Echo Request MUST be sent as an ESP packet using
-the established SA, receiving the same level of protection as any
-other traffic on that SA. It SHOULD use an SPI value previously
-established, whether negotiated through IKEv2 or configured manually.
+The ESP Echo Protocol operates in two modes:
 
-The initiator sets the ESP Next Header field to AGGFRAG_PAYLOAD (144),
-as specified in [[RFC9347]]. The ESP payload contains one of the echo
-request sub-type payloads defined in this document, optionally
-followed by padding.
+- *Encrypted Mode*: Used over established IPsec Security Associations
+  (SAs) [[RFC7296]], where echo packets receive the same cryptographic
+  protection as other traffic on the SA.
+- *Unencrypted Mode*: Used outside the context of a negotiated ESP SA
+  using fixed SPI values 7 (Request) and 8 (Reply) without encryption
+  (Section 5.5).
 
-The receiving IPsec peer, having established ESP through IKE, MAY
-respond with an ESP Echo Response. The ESP Echo Response MUST be
-sent as an ESP packet using the corresponding SA and SPI. The
-responder also sets the ESP Next Header field to AGGFRAG_PAYLOAD (144),
-followed by the response sub-type payload.
+In both modes, an endpoint MAY send an ESP Echo Request to assess path
+reachability, discover path MTU, or maintain middlebox state.
 
-Two payload formats are defined: the existing Congestion Control
-payload (Section 4.1) and the new Encrypted ESP Ping payload
-(Section 4.2).
+The ESP Next Header MUST be set to AGGFRAG_PAYLOAD (144) [[RFC9347]],
+carrying the ESP Echo payload format defined in Section 5.3, including
+optional Data.
 
-
-** Using Congestion Control Payload
-
-IP-TFS Congestion Control AGGFRAG_PAYLOAD Payload Format as specified
-in [[RFC9347]] Section 6.1.2 can be used for Echo Request and
-response. When using this payload for Echo Request and response, IPv4
-or IPv6 Data Block MUST NOT be concatenated, especially when
-USE_AGGFRAG is not successfully negotiated. This request does
-not support requesting a specific return path.
-
-[AA when using USE_AGGFRAG tunnel is negotiated, responder may
-concatenate AGGFRAG_PAYLOAD Congestion control probe]
-
-The Echo request and response payloads are not subject to IPsec
-Security Policy (SP), typically negotiated using IKEv2 and manually
-configured. End padding would be necessary if the tunnel
-is always sending fixed size ESP payload or to possibly detect path
-anomalies.
-
-When probing do not take the lack of a response alone as an
-indication of the unreachability of the return path using ESP echo;
-also consider the received bytes on the return path. IPsec has a
-unique advantage over other tunneling protocols when the return path
-shows incoming bytes, indicating that the path is partially
-functional. This is especially useful when used as a liveness check
-on busy paths. When there is no response, instead of concluding that
-the path is not viable and taking action, such as tearing down the
-IPsec connection, read the incoming bytes. This would help avoid
-tearing down busy paths due to the missing ESP echo response.
+When an incoming request has the Reply path flag set (R=1), the receiving
+peer SHOULD reply on the specified SPI using an ESP packet with Next
+Header 144 (AGGFRAG_PAYLOAD) and the ESP Echo Reply payload. When R=0,
+the receiver MUST NOT reply.
 
 
-** Encrypted ESP Ping Payload Format
+** Traffic Selector and Security Policy Exemption
 
-#+caption: Congestion
-          Control Payload Format
+Under standard [[RFC4301]] inbound processing, decrypted ESP packets
+are verified against the Security Policy Database (SPD) traffic
+selectors associated with the SA. Because Next Header 144
+(AGGFRAG_PAYLOAD) control messages---including all ESP Echo Request
+and Reply payloads defined in this document---are non-IP control
+messages without inner IP headers or traffic addresses, they MUST NOT
+be subjected to inbound SPD traffic selector verification. This
+exemption applies equally to Encrypted Mode (Section 5.3) and
+Unencrypted Mode (Section 5.5) ESP Echo payloads.
+
+
+** Standalone Framing and IP-TFS Interaction
+
+ESP Echo Request and Reply packets are standalone control messages.
+When transmitting ESP Echo packets, implementations MUST NOT aggregate
+or fragment ESP Echo payloads with IP-TFS data blocks or other AGGFRAG
+sub-types. Each ESP Echo packet MUST be carried in its own dedicated
+ESP packet with Next Header set to 144 (AGGFRAG_PAYLOAD).
+
+
+** ESP Echo Payload Format
+
+The ESP Echo payload format consists of a fixed 12-octet header followed
+by optional Data:
+
+#+caption: ESP Echo Payload Format
 #+name: echo-echo-payload
 #+begin_src
 
@@ -253,62 +305,156 @@ tearing down busy paths due to the missing ESP echo response.
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |   Sub-type    |R|  Reserved   |          Data Length          |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|Identifier (ID)              |Sequence Number                  |
+|        Identifier (ID)        |        Sequence Number        |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-| Return path SPI                                               |
+| Reply path SPI                                                |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 | Data ...
 +-+-+-+-+-+-+-+-+-+-+-
 #+end_src
 
-- Sub-Type: ESP-ECHO-REQUEST or ESP-ECHO-RESPONSE
-- Return path (R): 1 bit flag, set when requesting a specific return path SPI
+- Sub-Type: ESP-ECHO-REQUEST or ESP-ECHO-REPLY
+- Reply path (R): 1-bit flag. Set to 1 to request an Echo Reply; set to 0
+  when no reply is requested.
 - Reserved: 7 bits
-- Data Length: number of data octets following, length 16 bits
-- Identifier : A 16-bit request identifier. The identifier SHOULD be set
+- Data Length: Length of the following Data field in octets (16 bits)
+- Identifier: A 16-bit request identifier. The identifier SHOULD be set
   to a unique value to distinguish between different ESP Request
   sessions. The responder copies it from the request.
 - Sequence number: A 16-bit field that increments with each echo
   request sent.
-- Return path: 32 bits, optional requested return path SPI, when R is
-  set to one.
-- Data : Optional data that follows the Echo request.
+- Reply path SPI: 32 bits. Specifies the target SPI for the reply when
+  R=1; ignored when R=0.
+- Data: Zero or more octets of arbitrary data that follows the header.
+  In an Echo Reply, this data is copied from the request up to the reply
+  path MTU.
 
-The responder SHOULD copy the request message and MUST change the
-Sub-type to ESP-ECHO-RESPONSE. The SHOULD allows a responder to send
-a minimal response with a shorter or empty data section when
-resources are constrained.
+The ESP trailer MUST be constructed using the minimum allowable padding
+required by the cipher algorithm and [[RFC4303]]. In unencrypted mode
+([[RFC2410]]), the padding length MUST NOT exceed 3 octets.
 
-** Return Path Validation
 
-On the initiator, the return path SPI in the request MUST be in the
-local SADB with the same peer as the destination. The responder
-should also validate the requested return path SPI. When the SPI does
-not match the initiator in the SPD, the responder MUST NOT respond
-via the requested SPI. This is specifically to avoid amplification or
-DDoS. However, the responder MAY respond using the SPI of the SA
-on which the request was received.
+** Reply Path Processing and Validation
 
+When R=1, the Reply path SPI field MUST specify the target SPI for the
+reply. For unencrypted requests (outer SPI 7), the Reply path SPI MUST
+be set to 8 (ESP-ECHO-REPLY). If an unencrypted request on SPI 7 has R=1
+and the Reply path SPI is not 8, the responder SHOULD treat this as a
+protocol error and SHOULD NOT reply.
+
+For encrypted requests, the Reply path SPI MUST exist in the initiator's
+local SADB for the target peer. The responder SHOULD validate the
+requested Reply path SPI. If the requested SPI matches an established
+SA with the peer, the responder SHOULD transmit the Echo Reply via that
+SA. If the requested SPI does not match the peer in the SPD, the
+responder MUST NOT reply on that SPI to prevent amplification, though
+it MAY reply on the SA on which the request was received.
+
+When R=0, the responder MUST NOT reply, and any value in the Reply path
+SPI field MUST be ignored.
+
+When replying (R=1), the responder SHOULD copy the request message and
+MUST change the Sub-type to ESP-ECHO-REPLY; if the responder copies the
+request message, it MUST copy up to the reply path MTU.
+
+
+** Unencrypted Mode (Fixed SPI 7 and 8)
+
+An IPv4 or IPv6 node that desires to determine whether the path to a
+particular destination supports ESP packets outside the context of a
+negotiated ESP SA sends an unencrypted ESP Echo Request packet to that
+destination. In this mode, packets use the standard ESP packet format
+described in Section 2 of [[RFC4303]] with the NULL encryption algorithm
+[[RFC2410]] and no integrity protection (AUTH_NONE [[RFC7296]]):
+
+- The SPI field MUST be set to 7 (ESP-ECHO-REQUEST) for requests and 8
+  (ESP-ECHO-REPLY) for replies.
+- The Next Header field in the ESP trailer MUST be set to 144
+  (AGGFRAG_PAYLOAD).
+- Under NULL encryption [[RFC2410]] and no integrity protection
+  ([[RFC4303]] Section 2.7), the Initialization Vector (IV) and
+  Integrity Check Value (ICV) fields are omitted (0 octets in length).
+- The ESP Sequence Number SHOULD be set to 0, and replay protection
+  MUST NOT be enabled.
+- The ESP trailer contains 0 to 3 octets of Padding as needed to align
+  the trailer to a 4-octet boundary [[RFC2410]], followed by a 1-octet
+  Pad Length and the 1-octet Next Header (144).
+
+The inner payload utilizes the same fixed format defined in Section
+5.3. When requesting an unencrypted Echo Reply, the sender sets the
+Reply path flag (R=1) and sets the Reply path SPI field to 8
+(ESP-ECHO-REPLY). To send a one-way unencrypted probe without eliciting
+a reply, the sender sets R=0, and the Reply path SPI field is ignored by
+the receiver. Senders MAY include arbitrary data in the Data field up to
+the path MTU to verify large packet transmission; when R=1, the responder
+SHOULD copy the request data up to the reply path MTU.
+
+When no reply is received, a sender MUST NOT conclude that the network
+path is unable to transmit ESP packets. The absence of a reply can be
+caused by any of the following:
+- The remote peer does not support the ESP Echo Protocol (or local
+  policy chooses not to reply).
+- The network path does not support ESP packets (e.g., protocol 50 is
+  dropped by intermediate middleboxes or firewalls).
+- Intermediate network nodes permit regular ESP traffic with
+  operational negotiated SPIs, but drop ESP packets with reserved SPI
+  values (7 or 8).
+
+Senders SHOULD still attempt to establish standard ESP Security
+Associations if no alternative paths or protocols are available.
+
+
+Because unencrypted ESP Echo packets operate outside the context of a
+negotiated ESP SA, receivers MUST NOT require a dynamically negotiated
+Security Association to accept and process incoming packets with SPI
+values 7 and 8 (arriving over raw ESP protocol 50 or UDP/TCP
+encapsulation). Implementations MAY process these packets directly or
+MAY utilize static SADB entries configured with NULL encryption
+([[RFC2410]]) and no authentication to maintain administrative, policy,
+or rate-limiting information for unencrypted probing.
+
+** Behavior under UDP and TCP Encapsulation
+
+There is no distinction between ESP Echo packets and other ESP packets
+for the purposes of processing encapsulation under [[RFC3948]] (UDP
+encapsulation) and [[RFC8229]] (TCP encapsulation).
+
+If an implementation is capable of receiving UDP or TCP encapsulated
+packets, it SHOULD accept encapsulated ESP packets with SPI values 7
+and 8 on either, without the negotiation of an SA.
+
+When TCP encapsulation is used [[RFC8229]], path MTU discovery is
+ineffective. Because TCP segments and reassembles stream traffic,
+packets exceeding the path MTU are segmented rather than dropped by
+network bottlenecks. Consequently, over TCP encapsulation, ESP Echo
+functions as an SA reachability and liveness check rather than an MTU
+discovery tool.
 
 * IKEv2 Notification
 
-A peer negotiates support for Encrypted ESP Ping Mode 2 using the
-Notification Status Type `ENCRYPTED_PING_SUPPORTED` during the IKEv2
-negotiation, in the IKE_AUTH exchange. When this has been negotiated,
-the peer has committed to responding to ESP Echo Requests on all ESP
-SAs between the two peers, and the initiator can reliably interpret
-a lack of response as path failure.
+A peer announces support for the ESP Echo Protocol by including the
+Notification Status Type `ESP_ECHO_SUPPORTED` in the IKE_AUTH exchange
+during IKEv2 negotiation [[RFC7296]].
 
-When ENCRYPTED_PING_SUPPORTED has been negotiated, the peer SHOULD
-respond to ESP Echo Requests. Responding remains subject to local
-resource constraints, but the negotiation represents a commitment to
-support this functionality. A lack of response after a configurable
-timeout MAY be treated as an indication of path failure.
-
-For Mode 1 (USE_AGGFRAG), the commitment to respond is implicit in
-the USE_AGGFRAG negotiation itself.
+When `ESP_ECHO_SUPPORTED` has been negotiated, the peer SHOULD reply to
+ESP Echo Requests received on all Child SAs established under the IKE
+SA. The initiator can reliably interpret the absence of a reply after a
+configurable timeout as an indication of path failure.
 
 * IANA Considerations
+
+This document requests that IANA allocate two new values from the
+"Security Parameters Index (SPI)" registry:
+
+#+name: iana_requests_spi
+#+begin_src
+
+      Number   Description         Reference
+      ------   -----------------   ---------------
+      7        ESP-ECHO-REQUEST    [this document]
+      8        ESP-ECHO-REPLY      [this document]
+
+#+end_src
 
 This document defines two new registrations for the IANA ESP
 [[AGGFRAG]] PAYLOAD Sub-Types.
@@ -319,51 +465,64 @@ This document defines two new registrations for the IANA ESP
       Value   ESP AGGFRAG_PAYLOAD Sub-Type       Reference
       -----   ------------------------------    ---------------
       [TBD2]  ESP-ECHO-REQUEST                  [this document]
-      [TBD3]  ESP-ECHO-RESPONSE                 [this document]
+      [TBD3]  ESP-ECHO-REPLY                    [this document]
 
 #+end_src
 
-This document defines one new registration for the IANA
-"IKEv2 Notify Message Status Types" [[STATUSNOTIFY]].
+This document defines one new registration for the IANA "IKEv2 Notify
+Message Status Types" [[STATUSNOTIFY]].
 
 #+name: iana_requests_status
 #+begin_src
 
       Value     Notify Message Status Type      Reference
       -------  ----------------------------    ---------------
-      [TBD1]    ENCRYPTED_PING_SUPPORTED.       [this document]
+      [TBD1]    ESP_ECHO_SUPPORTED.       [this document]
 
 #+end_src
 
 
 * Operational Considerations
 
-When an explicit return path is requested and the ESP Echo responder
-SHOULD make best effort to respond via this path, however, if local
-policies do not allow this respond via another SA.
+When an explicit reply path is requested, the ESP Echo responder
+SHOULD make best effort to reply via this path; however, if local
+policies do not allow this, it MAY reply via another SA.
 
-A typical implementation involves creating an ESP Echo socket, which
-allows setting an outgoing SPI during initialization,and matching
-source and destination address. Once socket is setup before sending any
-data, only write payload with optionally specifying return path.
+A typical implementation can create an ESP Echo socket with an assigned
+outgoing SPI and matched source and destination addresses. Applications
+can then transmit ESP Echo Request payloads directly over the socket.
+
+For unencrypted probing using SPIs 7 and 8, packet capture tools on
+security gateways can filter specifically for these SPI values to
+debug transit reachability and MTU without decrypting user traffic.
 
 * Acknowledgments
 
-The authors thank Valery Smyslov for his thorough review and comments.
+The authors thank Tero Kivinen, Andrew McGregor, Valery Smyslov, and
+Paul Wouters for their thorough reviews and comments.
 
 * Security Considerations
 
-The security considerations are similar to other unconnected
-request-reply protocols such as ICMP or ICMPv6 echo. The proposed ESP
-echo and response does not constitute an amplification attack because
-the ESP Echo Reply is almost same size as the ESP Echo Request.
-It can also be rate limited or filtered using ingress filtering
-per BCP 38 [[RFC2827]]
+The security considerations are similar to other request-reply
+protocols such as ICMP. ESP Echo does not enable amplification attacks
+because an Echo Reply is never larger than the corresponding Echo
+Request. It can also be rate limited or filtered using ingress
+filtering per BCP 38 [[RFC2827]].
+
+To prevent downgrade attacks where security is compromised, IPsec
+nodes MUST NOT fall back to unencrypted plaintext communication if ESP
+Echo probing fails; nodes MAY attempt session migration (e.g., via
+MOBIKE) or switch to UDP encapsulation. In unencrypted mode,
+intermediate nodes might selectively permit or forge packets with SPI
+7 or 8; however, within an established ESP SA, Encrypted Mode
+cryptographically authenticates all echo requests and replies.
 
 
 * Normative References
 
+** RFC0792
 ** RFC2119
+** RFC2410
 ** RFC2827
 ** RFC4301
 ** RFC4303
@@ -385,12 +544,9 @@ per BCP 38 [[RFC2827]]
 
 * Informative References
 
+** RFC3948
+** RFC4555
+** RFC4787
+** RFC6092
 ** RFC7110
-** I-D.ietf-ipsecme-esp-ping
 ** I-D.ietf-ipsecme-ikev2-reliable-transport
-
-
-
-* Additional Stuff
-
-TBD
