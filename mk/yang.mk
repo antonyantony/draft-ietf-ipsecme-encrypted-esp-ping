@@ -92,8 +92,9 @@ $(LBASE).%: $(VBASE).%
 # ------------
 
 idnits: $(VBASE).txt
-	if [ ! -e idnits ]; then curl -fLO 'http://tools.ietf.org/tools/idnits/idnits'; chmod 755 idnits; fi
+	if [ ! -e idnits ]; then curl -fLo idnits 'https://raw.githubusercontent.com/ietf-tools/idnits/main/idnits'; chmod 755 idnits; fi
 	./idnits --verbose $<
+
 
 .PHONY: iddiff
 iddiff: $(VBASE).txt
