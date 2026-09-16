@@ -31,9 +31,9 @@
 This document defines the ESP Echo Protocol, an extension to the ESP
 AGGFRAG protocol [[RFC9347]] that provides an Echo Request and Echo
 Reply mechanism for IP Security (IPsec) link diagnostics. It enables
-endpoints to assess end-to-end path reachability and discover path
-Maximum Transmission Unit (MTU) using Encapsulating Security Payload
-(ESP) packets.
+endpoints to assess end-to-end path reachability, and it defines probe
+packets that can be used for path Maximum Transmission Unit (MTU)
+discovery, using Encapsulating Security Payload (ESP) packets.
 
 The protocol supports two modes of operation: an encrypted mode used
 over established IPsec Security Associations (SAs), with an option to
@@ -77,6 +77,12 @@ sub-types for ESP Echo Request and Reply, which operate independently
 of IP-TFS aggregation and do not require USE_AGGFRAG negotiation. This
 document also updates Section 2.1 of [[RFC4303]] by defining the fixed
 SPI values 7 and 8 for unencrypted ESP Echo packets.
+
+This document does not specify a Path MTU discovery algorithm. It
+defines only the messaging layer, ESP Echo Request and Reply packets
+with a Data field, that an implementation can use as probe packets.
+How probes are sent and how the result is used are out of scope; see
+[[RFC4821]] and [[RFC8899]] for existing algorithms.
 
 
 ** Terminology
@@ -233,7 +239,8 @@ To determine which mechanism to use:
   payloads when operating an active IP-TFS tunnel to provide real-time
   loss and delay feedback for IP-TFS rate adaptation algorithms.
 - *When to use ESP Echo*: Use the ESP Echo Protocol when verifying
-  reachability, liveness, or Path MTU on standard (non-IP-TFS) ESP SAs;
+  reachability, liveness, or probing Path MTU on standard (non-IP-TFS)
+  ESP SAs;
   when probing specific return paths across multiple SAs; when sending
   unidirectional keepalives or maintaining NAT state without eliciting
   replies (R=0); or when probing unencrypted paths prior to SA
@@ -257,7 +264,7 @@ The ESP Echo Protocol operates in two modes:
   (Section 5.5).
 
 In both modes, an endpoint MAY send an ESP Echo Request to assess path
-reachability, discover path MTU, or maintain middlebox state.
+reachability, probe path MTU, or maintain middlebox state.
 
 The ESP Next Header MUST be set to AGGFRAG_PAYLOAD (144) [[RFC9347]],
 carrying the ESP Echo payload format defined in Section 5.3, including
@@ -438,7 +445,7 @@ ineffective. Because TCP segments and reassembles stream traffic,
 packets exceeding the path MTU are segmented rather than dropped by
 network bottlenecks. Consequently, over TCP encapsulation, ESP Echo
 functions as an SA reachability and liveness check rather than an MTU
-discovery tool.
+probe.
 
 * IKEv2 Notification
 
@@ -557,8 +564,10 @@ cryptographically authenticates all echo requests and replies.
 ** RFC3948
 ** RFC4555
 ** RFC4787
+** RFC4821
 ** RFC6092
 ** RFC7110
 ** RFC8229
+** RFC8899
 ** I-D.ietf-ipsecme-ikev2-reliable-transport
 
