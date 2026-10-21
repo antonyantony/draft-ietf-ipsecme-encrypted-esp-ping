@@ -1,0 +1,2147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta content="Common,Latin" name="scripts">
+<meta content="initial-scale=1.0" name="viewport">
+<title>ESP Echo Protocol</title>
+<meta content="Antony Antony" name="author">
+<meta content="Steffen Klassert" name="author">
+<meta content="Lorenzo Colitti" name="author">
+<meta content="Jen Linkova" name="author">
+<meta content="Michael Richardson" name="author">
+<meta content="Nathan Harold" name="author">
+<meta content="
+       
+       This document defines the ESP Echo Protocol, an extension to the ESP
+AGGFRAG protocol   that provides an Echo Request and Echo
+Reply mechanism for IP Security (IPsec) link diagnostics. It enables
+endpoints to assess end-to-end path reachability, and it defines probe
+packets that can be used for path Maximum Transmission Unit (MTU)
+discovery, using Encapsulating Security Payload (ESP) packets. 
+       The protocol supports two modes of operation: an encrypted mode used
+over established IPsec Security Associations (SAs), with an option to
+specify a preferred reply path when multiple SAs exist between the
+peers, and an unencrypted mode used outside the context of a
+negotiated ESP SA. In addition to bidirectional echo probing, the
+protocol supports sending one-way ESP packets without eliciting a
+reply, primarily for keepalives, NAT and firewall pinhole maintenance,
+and unidirectional link diagnostics. 
+       A peer can announce support for ESP Echo using a new IKEv2 Status
+Notification ESP_ECHO_SUPPORTED. 
+    " name="description">
+<meta content="xml2rfc 3.31.0" name="generator">
+<meta content="IPsec" name="keyword">
+<meta content="ESP" name="keyword">
+<meta content="Ping" name="keyword">
+<meta content="draft-ietf-ipsecme-encrypted-esp-ping-04" name="ietf.draft">
+<!-- Generator version information:
+  xml2rfc 3.31.0
+    Python 3.14.7
+    ConfigArgParse 1.7.1
+    google-i18n-address 3.1.1
+    intervaltree 3.2.1
+    Jinja2 3.1.6
+    lxml 6.1.1
+    platformdirs 4.5.1
+    pycountry 24.6.1
+    PyYAML 6.0.3
+    requests 2.32.5
+    wcwidth 0.2.14
+-->
+<link href="draft-ietf-ipsecme-encrypted-esp-ping-04.xml" rel="alternate" type="application/rfc+xml">
+<link href="#copyright" rel="license">
+<style type="text/css">/*
+
+  NOTE: Changes at the bottom of this file overrides some earlier settings.
+
+  Once the style has stabilized and has been adopted as an official RFC style,
+  this can be consolidated so that style settings occur only in one place, but
+  for now the contents of this file consists first of the initial CSS work as
+  provided to the RFC Formatter (xml2rfc) work, followed by itemized and
+  commented changes found necessary during the development of the v3
+  formatters.
+
+*/
+
+/* fonts */
+@import url('https://static.ietf.org/fonts/noto-sans/import.css'); /* Sans-serif */
+@import url('https://static.ietf.org/fonts/noto-serif/import.css'); /* Serif (print) */
+@import url('https://static.ietf.org/fonts/roboto-mono/import.css'); /* Monospace */
+
+:root {
+  --font-sans: 'Noto Sans', Arial, Helvetica, sans-serif;
+  --font-serif: 'Noto Serif', 'Times', 'Times New Roman', serif;
+  --font-mono: 'Roboto Mono', Courier, 'Courier New', monospace;
+}
+
+@viewport {
+  zoom: 1.0;
+}
+@-ms-viewport {
+  width: extend-to-zoom;
+  zoom: 1.0;
+}
+/* general and mobile first */
+html {
+}
+body {
+  max-width: 90%;
+  margin: 1.5em auto;
+  color: #222;
+  background-color: #fff;
+  font-size: 14px;
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  scroll-behavior: smooth;
+  overflow-wrap: break-word;
+}
+.ears {
+  display: none;
+}
+
+/* headings */
+#title, h1, h2, h3, h4, h5, h6 {
+  margin: 1em 0 0.5em;
+  font-weight: bold;
+  line-height: 1.3;
+}
+#title {
+  clear: both;
+  border-bottom: 1px solid #ddd;
+  margin: 0 0 0.5em 0;
+  padding: 1em 0 0.5em;
+}
+.author {
+  padding-bottom: 4px;
+}
+h1 {
+  font-size: 26px;
+  margin: 1em 0;
+}
+h2 {
+  font-size: 22px;
+  margin-top: -20px;  /* provide offset for in-page anchors */
+  padding-top: 33px;
+}
+h3 {
+  font-size: 18px;
+  margin-top: -36px;  /* provide offset for in-page anchors */
+  padding-top: 42px;
+}
+h4 {
+  font-size: 16px;
+  margin-top: -36px;  /* provide offset for in-page anchors */
+  padding-top: 42px;
+}
+h5, h6 {
+  font-size: 14px;
+}
+#n-copyright-notice {
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 1em;
+  margin-bottom: 1em;
+}
+/* general structure */
+p {
+  padding: 0;
+  margin: 0 0 1em 0;
+  text-align: left;
+}
+div, span {
+  position: relative;
+}
+div {
+  margin: 0;
+}
+.alignRight.art-text {
+  background-color: #f9f9f9;
+  border: 1px solid #eee;
+  border-radius: 3px;
+  padding: 1em 1em 0;
+  margin-bottom: 1.5em;
+}
+.alignRight.art-text pre {
+  padding: 0;
+}
+.alignRight {
+  margin: 1em 0;
+}
+.alignRight > *:first-child {
+  border: none;
+  margin: 0;
+  float: right;
+  clear: both;
+}
+.alignRight > *:nth-child(2) {
+  clear: both;
+  display: block;
+  border: none;
+}
+svg {
+  display: block;
+}
+@media print {
+  svg {
+    max-height: 850px;
+    max-width: 660px;
+  }
+}
+svg[font-family~="serif" i], svg [font-family~="serif" i] {
+  font-family: var(--font-serif);
+}
+svg[font-family~="sans-serif" i], svg [font-family~="sans-serif" i] {
+  font-family: var(--font-sans);
+}
+svg[font-family~="monospace" i], svg [font-family~="monospace" i] {
+  font-family: var(--font-mono);
+}
+.alignCenter.art-text {
+  background-color: #f9f9f9;
+  border: 1px solid #eee;
+  border-radius: 3px;
+  padding: 1em 1em 0;
+  margin-bottom: 1.5em;
+}
+.alignCenter.art-text pre {
+  padding: 0;
+}
+.alignCenter {
+  margin: 1em 0;
+}
+.alignCenter > *:first-child {
+  display: table;
+  border: none;
+  margin: 0 auto;
+}
+
+/* lists */
+ol, ul {
+  padding: 0;
+  margin: 0 0 1em 2em;
+}
+ol ol, ul ul, ol ul, ul ol {
+  margin-left: 1em;
+}
+li {
+  margin: 0 0 0.25em 0;
+}
+.ulCompact li {
+  margin: 0;
+}
+ul.empty, .ulEmpty {
+  list-style-type: none;
+}
+ul.empty li, .ulEmpty li {
+  margin-top: 0.5em;
+}
+ul.ulBare, li.ulBare {
+  margin-left: 0em !important;
+}
+ul.compact, .ulCompact,
+ol.compact, .olCompact {
+  line-height: 100%;
+  margin: 0 0 0 2em;
+}
+
+/* definition lists */
+dl {
+}
+dl > dt {
+  float: left;
+  margin-right: 1em;
+}
+/* 
+dl.nohang > dt {
+  float: none;
+}
+*/
+dl > dd {
+  margin-bottom: .8em;
+  min-height: 1.3em;
+}
+dl.compact > dd, .dlCompact > dd {
+  margin-bottom: 0em;
+}
+dl > dd > dl {
+  margin-top: 0.5em;
+  margin-bottom: 0em;
+}
+
+/* links */
+a {
+  text-decoration: none;
+}
+a[href] {
+  color: #22e; /* Arlen: WCAG 2019 */
+}
+a[href]:hover {
+  background-color: #f2f2f2;
+}
+figcaption a[href],
+a[href].selfRef {
+  color: #222;
+}
+/* XXX probably not this:
+a.selfRef:hover {
+  background-color: transparent;
+  cursor: default;
+} */
+
+/* Figures */
+tt, code, pre {
+  background-color: #f9f9f9;
+  font-family: var(--font-mono);
+}
+pre {
+  border: 1px solid #eee;
+  margin: 0;
+  padding: 1em;
+}
+img {
+  max-width: 100%;
+}
+figure {
+  margin: 0;
+}
+figure blockquote {
+  margin: 0.8em 0.4em 0.4em;
+}
+figcaption {
+  font-style: italic;
+  margin: 0 0 1em 0;
+}
+@media screen {
+  pre {
+    overflow-x: auto;
+    max-width: 100%;
+    max-width: calc(100% - 22px);
+  }
+}
+
+/* aside, blockquote */
+aside, blockquote {
+  margin-left: 0;
+  padding: 1.2em 2em;
+}
+blockquote {
+  background-color: #f9f9f9;
+  color: #111; /* Arlen: WCAG 2019 */
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  margin: 1em 0;
+}
+blockquote > *:last-child {
+  margin-bottom: 0;
+}
+cite {
+  display: block;
+  text-align: right;
+  font-style: italic;
+}
+.xref {
+  overflow-wrap: normal;
+}
+
+/* tables */
+table {
+  width: 100%;
+  margin: 0 0 1em;
+  border-collapse: collapse;
+  border: 1px solid #eee;
+}
+th, td {
+  text-align: left;
+  vertical-align: top;
+  padding: 0.5em 0.75em;
+}
+th {
+  text-align: left;
+  background-color: #e9e9e9;
+}
+tr:nth-child(2n+1) > td {
+  background-color: #f5f5f5;
+}
+table caption {
+  font-style: italic;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+}
+table p {
+  /* XXX to avoid bottom margin on table row signifiers. If paragraphs should
+     be allowed within tables more generally, it would be far better to select on a class. */
+  margin: 0;
+}
+
+/* pilcrow */
+a.pilcrow {
+  color: #666; /* Arlen: AHDJ 2019 */
+  text-decoration: none;
+  visibility: hidden;
+  user-select: none;
+  -ms-user-select: none;
+  -o-user-select:none;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+@media screen {
+  aside:hover > a.pilcrow,
+  p:hover > a.pilcrow,
+  blockquote:hover > a.pilcrow,
+  div:hover > a.pilcrow,
+  li:hover > a.pilcrow,
+  pre:hover > a.pilcrow {
+    visibility: visible;
+  }
+  a.pilcrow:hover {
+    background-color: transparent;
+  }
+}
+
+/* misc */
+hr {
+  border: 0;
+  border-top: 1px solid #eee;
+}
+.bcp14 {
+  font-variant: small-caps;
+}
+
+.role {
+  font-variant: all-small-caps;
+}
+
+/* info block */
+#identifiers {
+  margin: 0;
+  font-size: 0.9em;
+}
+#identifiers dt {
+  width: 3em;
+  clear: left;
+}
+#identifiers dd {
+  float: left;
+  margin-bottom: 0;
+}
+/* Fix PDF info block run off issue */
+@media print {
+  #identifiers dd {
+    max-width: 100%;
+  }
+}
+#identifiers .authors .author {
+  display: inline-block;
+  margin-right: 1.5em;
+}
+#identifiers .authors .org {
+  font-style: italic;
+}
+
+/* The prepared/rendered info at the very bottom of the page */
+.docInfo {
+  color: #666; /* Arlen: WCAG 2019 */
+  font-size: 0.9em;
+  font-style: italic;
+  margin-top: 2em;
+}
+.docInfo .prepared {
+  float: left;
+}
+.docInfo .prepared {
+  float: right;
+}
+
+/* table of contents */
+#toc  {
+  padding: 0.75em 0 2em 0;
+  margin-bottom: 1em;
+}
+nav.toc ul {
+  margin: 0 0.5em 0 0;
+  padding: 0;
+  list-style: none;
+}
+nav.toc li {
+  line-height: 1.3em;
+  margin: 0.75em 0;
+  padding-left: 1.2em;
+  text-indent: -1.2em;
+}
+/* references */
+.references dt {
+  text-align: right;
+  font-weight: bold;
+  min-width: 7em;
+}
+.references dd {
+  margin-left: 8em;
+  overflow: auto;
+}
+
+.refInstance {
+  margin-bottom: 1.25em;
+}
+
+.refSubseries {
+  margin-bottom: 1.25em;
+}
+
+.references .ascii {
+  margin-bottom: 0.25em;
+}
+
+/* index */
+.index ul {
+  margin: 0 0 0 1em;
+  padding: 0;
+  list-style: none;
+}
+.index ul ul {
+  margin: 0;
+}
+.index li {
+  margin: 0;
+  text-indent: -2em;
+  padding-left: 2em;
+  padding-bottom: 5px;
+}
+.indexIndex {
+  margin: 0.5em 0 1em;
+}
+.index a {
+  font-weight: 700;
+}
+/* make the index two-column on all but the smallest screens */
+@media (min-width: 600px) {
+  .index ul {
+    -moz-column-count: 2;
+    -moz-column-gap: 20px;
+  }
+  .index ul ul {
+    -moz-column-count: 1;
+    -moz-column-gap: 0;
+  }
+}
+
+/* authors */
+address.vcard {
+  font-style: normal;
+  margin: 1em 0;
+}
+
+address.vcard .nameRole {
+  font-weight: 700;
+  margin-left: 0;
+}
+address.vcard .label {
+  font-family: var(--font-sans);
+  margin: 0.5em 0;
+}
+address.vcard .type {
+  display: none;
+}
+.alternative-contact {
+  margin: 1.5em 0 1em;
+}
+hr.addr {
+  border-top: 1px dashed;
+  margin: 0;
+  color: #ddd;
+  max-width: calc(100% - 16px);
+}
+
+/* temporary notes */
+.rfcEditorRemove::before {
+  position: absolute;
+  top: 0.2em;
+  right: 0.2em;
+  padding: 0.2em;
+  content: "The RFC Editor will remove this note";
+  color: #9e2a00; /* Arlen: WCAG 2019 */
+  background-color: #ffd; /* Arlen: WCAG 2019 */
+}
+.rfcEditorRemove {
+  position: relative;
+  padding-top: 1.8em;
+  background-color: #ffd; /* Arlen: WCAG 2019 */
+  border-radius: 3px;
+}
+.cref {
+  background-color: #ffd; /* Arlen: WCAG 2019 */
+  padding: 2px 4px;
+}
+.crefSource {
+  font-style: italic;
+}
+/* alternative layout for smaller screens */
+@media screen and (max-width: 1023px) {
+  body {
+    padding-top: 2em;
+  }
+  #title {
+    padding: 1em 0;
+  }
+  h1 {
+    font-size: 24px;
+  }
+  h2 {
+    font-size: 20px;
+    margin-top: -18px;  /* provide offset for in-page anchors */
+    padding-top: 38px;
+  }
+  #identifiers dd {
+    max-width: 60%;
+  }
+  #toc {
+    position: fixed;
+    z-index: 2;
+    top: 0;
+    right: 0;
+    padding: 0;
+    margin: 0;
+    background-color: inherit;
+    border-bottom: 1px solid #ccc;
+  }
+  #toc h2 {
+    margin: -1px 0 0 0;
+    padding: 4px 0 4px 6px;
+    padding-right: 1em;
+    min-width: 190px;
+    font-size: 1.1em;
+    text-align: right;
+    background-color: #444;
+    color: white;
+    cursor: pointer;
+  }
+  #toc h2::before { /* css hamburger */
+    float: right;
+    position: relative;
+    width: 1em;
+    height: 1px;
+    left: -164px;
+    margin: 6px 0 0 0;
+    background: white none repeat scroll 0 0;
+    box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
+    content: "";
+  }
+  #toc nav {
+    display: none;
+    padding: 0.5em 1em 1em;
+    overflow: auto;
+    height: calc(100vh - 48px);
+    border-left: 1px solid #ddd;
+  }
+}
+
+/* alternative layout for wide screens */
+@media screen and (min-width: 1024px) {
+  body {
+    max-width: 724px;
+    margin: 42px auto;
+    padding-left: 1.5em;
+    padding-right: 29em;
+  }
+  #toc {
+    position: fixed;
+    top: 42px;
+    right: 42px;
+    width: 25%;
+    margin: 0;
+    padding: 0 1em;
+    z-index: 1;
+  }
+  #toc h2 {
+    border-top: none;
+    border-bottom: 1px solid #ddd;
+    font-size: 1em;
+    font-weight: normal;
+    margin: 0;
+    padding: 0.25em 1em 1em 0;
+  }
+  #toc nav {
+    display: block;
+    height: calc(90vh - 84px);
+    bottom: 0;
+    padding: 0.5em 0 0;
+    overflow: auto;
+  }
+  img { /* future proofing */
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* pagination */
+@media print {
+  body {
+    width: 100%;
+  }
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+  #n-copyright-notice {
+    border-bottom: none;
+  }
+  #toc, #n-introduction {
+    page-break-before: always;
+  }
+  #toc {
+    border-top: none;
+    padding-top: 0;
+  }
+  figure, pre {
+    page-break-inside: avoid;
+  }
+  figure {
+    overflow: scroll;
+  }
+  .breakable pre {
+    break-inside: auto;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+  }
+  h2+*, h3+*, h4+*, h5+*, h6+* {
+    page-break-before: avoid;
+  }
+  pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 10pt;
+  }
+  table {
+    border: 1px solid #ddd;
+  }
+  td {
+    border-top: 1px solid #ddd;
+  }
+}
+
+/* This is commented out here, as the string-set: doesn't
+   pass W3C validation currently */
+/*
+.ears thead .left {
+  string-set: ears-top-left content();
+}
+
+.ears thead .center {
+  string-set: ears-top-center content();
+}
+
+.ears thead .right {
+  string-set: ears-top-right content();
+}
+
+.ears tfoot .left {
+  string-set: ears-bottom-left content();
+}
+
+.ears tfoot .center {
+  string-set: ears-bottom-center content();
+}
+
+.ears tfoot .right {
+  string-set: ears-bottom-right content();
+}
+*/
+
+@page :first {
+  padding-top: 0;
+  @top-left {
+    content: normal;
+    border: none;
+  }
+  @top-center {
+    content: normal;
+    border: none;
+  }
+  @top-right {
+    content: normal;
+    border: none;
+  }
+}
+
+@page {
+  size: A4;
+  margin-bottom: 45mm;
+  padding-top: 20px;
+  /* The following is commented out here, but set appropriately by in code, as
+     the content depends on the document */
+  /*
+  @top-left {
+    content: 'Internet-Draft';
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @top-left {
+    content: string(ears-top-left);
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @top-center {
+    content: string(ears-top-center);
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @top-right {
+    content: string(ears-top-right);
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @bottom-left {
+    content: string(ears-bottom-left);
+    vertical-align: top;
+    border-top: solid 1px #ccc;
+  }
+  @bottom-center {
+    content: string(ears-bottom-center);
+    vertical-align: top;
+    border-top: solid 1px #ccc;
+  }
+  @bottom-right {
+      content: '[Page ' counter(page) ']';
+      vertical-align: top;
+      border-top: solid 1px #ccc;
+  }
+  */
+
+}
+
+/* Changes introduced to fix issues found during implementation */
+/* Make sure links are clickable even if overlapped by following H* */
+a {
+  z-index: 2;
+}
+/* Separate body from document info even without intervening H1 */
+section {
+  clear: both;
+}
+
+
+/* Top align author divs, to avoid names without organization dropping level with org names */
+.author {
+  vertical-align: top;
+}
+
+/* Leave room in document info to show Internet-Draft on one line */
+#identifiers dt {
+  width: 8em;
+}
+
+/* Don't waste quite as much whitespace between label and value in doc info */
+#identifiers dd {
+  margin-left: 1em;
+}
+
+/* Give floating toc a background color (needed when it's a div inside section */
+#toc {
+  background-color: white;
+}
+
+/* Make the collapsed ToC header render white on gray also when it's a link */
+@media screen and (max-width: 1023px) {
+  #toc h2 a,
+  #toc h2 a:link,
+  #toc h2 a:focus,
+  #toc h2 a:hover,
+  #toc a.toplink,
+  #toc a.toplink:hover {
+    color: white;
+    background-color: #444;
+    text-decoration: none;
+  }
+}
+
+/* Give the bottom of the ToC some whitespace */
+@media screen and (min-width: 1024px) {
+  #toc {
+    padding: 0 0 1em 1em;
+  }
+}
+
+/* Style section numbers with more space between number and title */
+.section-number {
+  padding-right: 0.5em;
+}
+
+/* prevent monospace from becoming overly large */
+tt, code, pre {
+  font-size: 95%;
+}
+
+/* Fix the height/width aspect for ascii art*/
+.sourcecode pre,
+.art-text pre {
+  line-height: 1.12;
+}
+
+
+/* Add styling for a link in the ToC that points to the top of the document */
+a.toplink {
+  float: right;
+  margin-right: 0.5em;
+}
+
+/* Fix the dl styling to match the RFC 7992 attributes */
+dl > dt,
+dl.dlParallel > dt {
+  float: left;
+  margin-right: 1em;
+}
+dl.dlNewline > dt {
+  float: none;
+}
+
+/* Provide styling for table cell text alignment */
+table td.text-left,
+table th.text-left {
+  text-align: left;
+}
+table td.text-center,
+table th.text-center {
+  text-align: center;
+}
+table td.text-right,
+table th.text-right {
+  text-align: right;
+}
+
+/* Make the alternative author contact information look less like just another
+   author, and group it closer with the primary author contact information */
+.alternative-contact {
+  margin: 0.5em 0 0.25em 0;
+}
+address .non-ascii {
+  margin: 0 0 0 2em;
+}
+
+/* With it being possible to set tables with alignment
+  left, center, and right, { width: 100%; } does not make sense */
+table {
+  width: auto;
+}
+
+/* Avoid reference text that sits in a block with very wide left margin,
+   because of a long floating dt label.*/
+.references dd {
+  overflow: visible;
+}
+
+/* Control caption placement */
+caption {
+  caption-side: bottom;
+}
+
+/* Limit the width of the author address vcard, so names in right-to-left
+   script don't end up on the other side of the page. */
+
+address.vcard {
+  max-width: 30em;
+  margin-right: auto;
+}
+
+/* For address alignment dependent on LTR or RTL scripts */
+address div.left {
+  text-align: left;
+}
+address div.right {
+  text-align: right;
+}
+
+/* Provide table alignment support.  We can't use the alignX classes above
+   since they do unwanted things with caption and other styling. */
+table.right {
+ margin-left: auto;
+ margin-right: 0;
+}
+table.center {
+ margin-left: auto;
+ margin-right: auto;
+}
+table.left {
+ margin-left: 0;
+ margin-right: auto;
+}
+
+/* Give the table caption label the same styling as the figcaption */
+caption a[href] {
+  color: #222;
+}
+
+@media print {
+  .toplink {
+    display: none;
+  }
+
+  /* avoid overwriting the top border line with the ToC header */
+  #toc {
+    padding-top: 1px;
+  }
+
+  /* Avoid page breaks inside dl and author address entries */
+  .vcard {
+    page-break-inside: avoid;
+  }
+
+}
+/* Tweak the bcp14 keyword presentation */
+.bcp14 {
+  font-variant: small-caps;
+  font-weight: bold;
+  font-size: 0.9em;
+}
+/* Tweak the invisible space above H* in order not to overlay links in text above */
+ h2 {
+  margin-top: -18px;  /* provide offset for in-page anchors */
+  padding-top: 31px;
+ }
+ h3 {
+  margin-top: -18px;  /* provide offset for in-page anchors */
+  padding-top: 24px;
+ }
+ h4 {
+  margin-top: -18px;  /* provide offset for in-page anchors */
+  padding-top: 24px;
+ }
+/* Float artwork pilcrow to the right */
+@media screen {
+  .artwork a.pilcrow {
+    display: block;
+    line-height: 0.7;
+    margin-top: 0.15em;
+  }
+}
+/* Make pilcrows on dd visible */
+@media screen {
+  dd:hover > a.pilcrow {
+    visibility: visible;
+  }
+}
+/* Make the placement of figcaption match that of a table's caption
+   by removing the figure's added bottom margin */
+.alignLeft.art-text,
+.alignCenter.art-text,
+.alignRight.art-text {
+   margin-bottom: 0;
+}
+.alignLeft,
+.alignCenter,
+.alignRight {
+  margin: 1em 0 0 0;
+}
+/* In print, the pilcrow won't show on hover, so prevent it from taking up space,
+   possibly even requiring a new line */
+@media print {
+  a.pilcrow {
+    display: none;
+  }
+}
+/* Styling for the external metadata */
+div#external-metadata {
+  background-color: #eee;
+  padding: 0.5em;
+  margin-bottom: 0.5em;
+  display: none;
+}
+div#internal-metadata {
+  padding: 0.5em;                       /* to match the external-metadata padding */
+}
+/* Styling for title RFC Number */
+h1#rfcnum {
+  clear: both;
+  margin: 0 0 -1em;
+  padding: 1em 0 0 0;
+}
+/* Make .olPercent look the same as <ol><li> */
+dl.olPercent > dd {
+  margin-bottom: 0.25em;
+  min-height: initial;
+}
+/* Give aside some styling to set it apart */
+aside {
+  border-left: 1px solid #ddd;
+  margin: 1em 0 1em 2em;
+  padding: 0.2em 2em;
+}
+aside > dl,
+aside > ol,
+aside > ul,
+aside > table,
+aside > p {
+  margin-bottom: 0.5em;
+}
+/* Additional page break settings */
+@media print {
+  figcaption, table caption {
+    page-break-before: avoid;
+  }
+}
+/* Font size adjustments for print */
+@media print {
+  body  { font-size: 10pt;      line-height: normal; max-width: 96%; }
+  h1    { font-size: 1.72em;    padding-top: 1.5em; } /* 1*1.2*1.2*1.2 */
+  h2    { font-size: 1.44em;    padding-top: 1.5em; } /* 1*1.2*1.2 */
+  h3    { font-size: 1.2em;     padding-top: 1.5em; } /* 1*1.2 */
+  h4    { font-size: 1em;       padding-top: 1.5em; }
+  h5, h6 { font-size: 1em;      margin: initial; padding: 0.5em 0 0.3em; }
+}
+/* Sourcecode margin in print, when there's no pilcrow */
+@media print {
+  .artwork,
+  .artwork > pre,
+  .sourcecode {
+    margin-bottom: 1em;
+  }
+}
+/* Avoid narrow tables forcing too narrow table captions, which may render badly */
+table {
+  min-width: 20em;
+}
+/* ol type a */
+ol.type-a { list-style-type: lower-alpha; }
+ol.type-A { list-style-type: upper-alpha; }
+ol.type-i { list-style-type: lower-roman; }
+ol.type-I { list-style-type: upper-roman; }
+/* Apply the print table and row borders in general, on request from the RPC,
+and increase the contrast between border and odd row background slightly */
+table {
+  border: 1px solid #ddd;
+}
+td {
+  border-top: 1px solid #ddd;
+}
+tr {
+  break-inside: avoid;
+}
+tr:nth-child(2n+1) > td {
+  background-color: #f8f8f8;
+}
+/* Use style rules to govern display of the TOC. */
+@media screen and (max-width: 1023px) {
+  #toc nav { display: none; }
+  #toc.active nav { display: block; }
+}
+/* Add support for keepWithNext */
+.keepWithNext {
+  break-after: avoid-page;
+  break-after: avoid-page;
+}
+/* Add support for keepWithPrevious */
+.keepWithPrevious {
+  break-before: avoid-page;
+}
+/* Change the approach to avoiding breaks inside artwork etc. */
+figure, pre, table, .artwork, .sourcecode  {
+  break-before: auto;
+  break-after: auto;
+}
+/* Avoid breaks between <dt> and <dd> */
+dl {
+  break-before: auto;
+  break-inside: auto;
+}
+dt {
+  break-before: auto;
+  break-after: avoid-page;
+}
+dd {
+  break-before: avoid-page;
+  break-after: auto;
+  orphans: 3;
+  widows: 3
+}
+span.break, dd.break {
+  margin-bottom: 0;
+  min-height: 0;
+  break-before: auto;
+  break-inside: auto;
+  break-after: auto;
+}
+/* Undo break-before ToC */
+@media print {
+  #toc {
+    break-before: auto;
+  }
+}
+/* Text in compact lists should not get extra bottom margin space,
+   since that would makes the list not compact */
+ul.compact p, .ulCompact p,
+ol.compact p, .olCompact p {
+ margin: 0;
+}
+/* But the list as a whole needs the extra space at the end */
+section ul.compact,
+section .ulCompact,
+section ol.compact,
+section .olCompact {
+  margin-bottom: 1em;                    /* same as p not within ul.compact etc. */
+}
+/* The tt and code background above interferes with for instance table cell
+   backgrounds.  Changed to something a bit more selective. */
+tt, code {
+  background-color: transparent;
+}
+p tt, p code, li tt, li code, dt tt, dt code {
+  background-color: #f8f8f8;
+}
+/* Tweak the pre margin -- 0px doesn't come out well */
+pre {
+   margin-top: 0.5px;
+}
+/* Tweak the compact list text */
+ul.compact, .ulCompact,
+ol.compact, .olCompact,
+dl.compact, .dlCompact {
+  line-height: normal;
+}
+/* Don't add top margin for nested lists */
+li > ul, li > ol, li > dl,
+dd > ul, dd > ol, dd > dl,
+dl > dd > dl {
+  margin-top: initial;
+}
+/* Elements that should not be rendered on the same line as a <dt> */
+/* This should match the element list in writer.text.TextWriter.render_dl() */
+dd > div.artwork:first-child,
+dd > aside:first-child,
+dd > blockquote:first-child,
+dd > figure:first-child,
+dd > ol:first-child,
+dd > div.sourcecode:first-child,
+dd > table:first-child,
+dd > ul:first-child {
+  clear: left;
+}
+/* fix for weird browser behaviour when <dd/> is empty */
+dt+dd:empty::before{
+  content: "\00a0";
+}
+/* Make paragraph spacing inside <li> smaller than in body text, to fit better within the list */
+li > p {
+  margin-bottom: 0.5em
+}
+/* Don't let p margin spill out from inside list items */
+li > p:last-of-type:only-child {
+  margin-bottom: 0;
+}
+</style>
+<link href="rfc-local.css" rel="stylesheet" type="text/css">
+<script type="application/javascript">async function addMetadata(){try{const e=document.styleSheets[0].cssRules;for(let t=0;t<e.length;t++)if(/#identifiers/.exec(e[t].selectorText)){const a=e[t].cssText.replace("#identifiers","#external-updates");document.styleSheets[0].insertRule(a,document.styleSheets[0].cssRules.length)}}catch(e){console.log(e)}const e=document.getElementById("external-metadata");if(e)try{var t,a="",o=function(e){const t=document.getElementsByTagName("meta");for(let a=0;a<t.length;a++)if(t[a].getAttribute("name")===e)return t[a].getAttribute("content");return""}("rfc.number");if(o){t="https://www.rfc-editor.org/rfc/rfc"+o+".json";try{const e=await fetch(t);a=await e.json()}catch(e){t=document.URL.indexOf("html")>=0?document.URL.replace(/html$/,"json"):document.URL+".json";const o=await fetch(t);a=await o.json()}}if(!a)return;e.style.display="block";const s="",d="https://datatracker.ietf.org/doc",n="https://datatracker.ietf.org/ipr/search",c="https://www.rfc-editor.org/info",l=a.doc_id.toLowerCase(),i=a.doc_id.slice(0,3).toLowerCase(),f=a.doc_id.slice(3).replace(/^0+/,""),u={status:"Status",obsoletes:"Obsoletes",obsoleted_by:"Obsoleted By",updates:"Updates",updated_by:"Updated By",see_also:"See Also",errata_url:"Errata"};let h="<dl style='overflow:hidden' id='external-updates'>";["status","obsoletes","obsoleted_by","updates","updated_by","see_also","errata_url"].forEach(e=>{if("status"==e){a[e]=a[e].toLowerCase();var t=a[e].split(" "),o=t.length,w="",p=1;for(let e=0;e<o;e++)p<o?w=w+r(t[e])+" ":w+=r(t[e]),p++;a[e]=w}else if("obsoletes"==e||"obsoleted_by"==e||"updates"==e||"updated_by"==e){var g,m="",b=1;g=a[e].length;for(let t=0;t<g;t++)a[e][t]&&(a[e][t]=String(a[e][t]).toLowerCase(),m=b<g?m+"<a href='"+s+"/rfc/".concat(a[e][t])+"'>"+a[e][t].slice(3)+"</a>, ":m+"<a href='"+s+"/rfc/".concat(a[e][t])+"'>"+a[e][t].slice(3)+"</a>",b++);a[e]=m}else if("see_also"==e){var y,L="",C=1;y=a[e].length;for(let t=0;t<y;t++)if(a[e][t]){a[e][t]=String(a[e][t]);var _=a[e][t].slice(0,3),v=a[e][t].slice(3).replace(/^0+/,"");L=C<y?"RFC"!=_?L+"<a href='"+s+"/info/"+_.toLowerCase().concat(v.toLowerCase())+"'>"+_+" "+v+"</a>, ":L+"<a href='"+s+"/info/"+_.toLowerCase().concat(v.toLowerCase())+"'>"+v+"</a>, ":"RFC"!=_?L+"<a href='"+s+"/info/"+_.toLowerCase().concat(v.toLowerCase())+"'>"+_+" "+v+"</a>":L+"<a href='"+s+"/info/"+_.toLowerCase().concat(v.toLowerCase())+"'>"+v+"</a>",C++}a[e]=L}else if("errata_url"==e){var R="";R=a[e]?R+"<a href='"+a[e]+"'>Errata exist</a> | <a href='"+d+"/"+l+"'>Datatracker</a>| <a href='"+n+"/?"+i+"="+f+"&submit="+i+"'>IPR</a> | <a href='"+c+"/"+l+"'>Info page</a>":"<a href='"+d+"/"+l+"'>Datatracker</a> | <a href='"+n+"/?"+i+"="+f+"&submit="+i+"'>IPR</a> | <a href='"+c+"/"+l+"'>Info page</a>",a[e]=R}""!=a[e]?"Errata"==u[e]?h+=`<dt>More info:</dt><dd>${a[e]}</dd>`:h+=`<dt>${u[e]}:</dt><dd>${a[e]}</dd>`:"Errata"==u[e]&&(h+=`<dt>More info:</dt><dd>${a[e]}</dd>`)}),h+="</dl>",e.innerHTML=h}catch(e){console.log(e)}else console.log("Could not locate metadata <div> element");function r(e){return e.charAt(0).toUpperCase()+e.slice(1)}}window.removeEventListener("load",addMetadata),window.addEventListener("load",addMetadata);</script>
+</head>
+<body class="xml2rfc">
+<table class="ears">
+<thead><tr>
+<td class="left">Internet-Draft</td>
+<td class="center">ESP Ping</td>
+<td class="right">October 2026</td>
+</tr></thead>
+<tfoot><tr>
+<td class="left">Antony, et al.</td>
+<td class="center">Expires 24 April 2027</td>
+<td class="right">[Page]</td>
+</tr></tfoot>
+</table>
+<div id="external-metadata" class="document-information"></div>
+<div id="internal-metadata" class="document-information">
+<dl id="identifiers">
+<dt class="label-workgroup">Workgroup:</dt>
+<dd class="workgroup">IP Security Maintenance and Extensions</dd>
+<dt class="label-updates">Updates:</dt>
+<dd class="updates">
+<a href="https://www.rfc-editor.org/rfc/rfc4303" class="eref">4303</a>, <a href="https://www.rfc-editor.org/rfc/rfc9347" class="eref">9347</a> (if approved)</dd>
+<dt class="label-published">Published:</dt>
+<dd class="published">
+<time datetime="2026-10-21" class="published">21 October 2026</time>
+    </dd>
+<dt class="label-intended-status">Intended Status:</dt>
+<dd class="intended-status">Standards Track</dd>
+<dt class="label-expires">Expires:</dt>
+<dd class="expires"><time datetime="2027-04-24">24 April 2027</time></dd>
+<dt class="label-authors">Authors:</dt>
+<dd class="authors">
+<div class="author">
+      <div class="author-name">A. Antony</div>
+<div class="org">secunet</div>
+</div>
+<div class="author">
+      <div class="author-name">S. Klassert</div>
+<div class="org">secunet</div>
+</div>
+<div class="author">
+      <div class="author-name">L. Colitti</div>
+<div class="org">Google</div>
+</div>
+<div class="author">
+      <div class="author-name">J. Linkova</div>
+<div class="org">Google</div>
+</div>
+<div class="author">
+      <div class="author-name">M. Richardson</div>
+<div class="org">Sandelman</div>
+</div>
+<div class="author">
+      <div class="author-name">N. Harold</div>
+<div class="org">Google</div>
+</div>
+</dd>
+</dl>
+</div>
+<h1 id="title">ESP Echo Protocol</h1>
+<section id="section-abstract">
+      <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
+<p id="section-abstract-1"></p>
+<p id="section-abstract-2">This document defines the ESP Echo Protocol, an extension to the ESP
+AGGFRAG protocol <span>[<a href="#RFC9347" class="cite xref">RFC9347</a>]</span> that provides an Echo Request and Echo
+Reply mechanism for IP Security (IPsec) link diagnostics. It enables
+endpoints to assess end-to-end path reachability, and it defines probe
+packets that can be used for path Maximum Transmission Unit (MTU)
+discovery, using Encapsulating Security Payload (ESP) packets.<a href="#section-abstract-2" class="pilcrow">¶</a></p>
+<p id="section-abstract-3">The protocol supports two modes of operation: an encrypted mode used
+over established IPsec Security Associations (SAs), with an option to
+specify a preferred reply path when multiple SAs exist between the
+peers, and an unencrypted mode used outside the context of a
+negotiated ESP SA. In addition to bidirectional echo probing, the
+protocol supports sending one-way ESP packets without eliciting a
+reply, primarily for keepalives, NAT and firewall pinhole maintenance,
+and unidirectional link diagnostics.<a href="#section-abstract-3" class="pilcrow">¶</a></p>
+<p id="section-abstract-4">A peer can announce support for ESP Echo using a new IKEv2 Status
+Notification ESP_ECHO_SUPPORTED.<a href="#section-abstract-4" class="pilcrow">¶</a></p>
+</section>
+<div id="status-of-memo">
+<section id="section-boilerplate.1">
+        <h2 id="name-status-of-this-memo">
+<a href="#name-status-of-this-memo" class="section-name selfRef">Status of This Memo</a>
+        </h2>
+<p id="section-boilerplate.1-1">
+        This Internet-Draft is submitted in full conformance with the
+        provisions of BCP 78 and BCP 79.<a href="#section-boilerplate.1-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-2">
+        Internet-Drafts are working documents of the Internet Engineering Task
+        Force (IETF). Note that other groups may also distribute working
+        documents as Internet-Drafts. The list of current Internet-Drafts is
+        at <span><a href="https://datatracker.ietf.org/drafts/current/">https://datatracker.ietf.org/drafts/current/</a></span>.<a href="#section-boilerplate.1-2" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-3">
+        Internet-Drafts are draft documents valid for a maximum of six months
+        and may be updated, replaced, or obsoleted by other documents at any
+        time. It is inappropriate to use Internet-Drafts as reference
+        material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-4">
+        This Internet-Draft will expire on 24 April 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="copyright">
+<section id="section-boilerplate.2">
+        <h2 id="name-copyright-notice">
+<a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
+        </h2>
+<p id="section-boilerplate.2-1">
+            Copyright (c) 2026 IETF Trust and the persons identified as the
+            document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.2-2">
+            This document is subject to BCP 78 and the IETF Trust's Legal
+            Provisions Relating to IETF Documents
+            (<span><a href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a></span>) in effect on the date of
+            publication of this document. Please review these documents
+            carefully, as they describe your rights and restrictions with
+            respect to this document. Code Components extracted from this
+            document must include Revised BSD License text as described in
+            Section 4.e of the Trust Legal Provisions and are provided without
+            warranty as described in the Revised BSD License.<a href="#section-boilerplate.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="toc">
+<section id="section-toc.1">
+        <a href="#" onclick="scroll(0,0)" class="toplink">▲</a><h2 id="name-table-of-contents">
+<a href="#name-table-of-contents" class="section-name selfRef">Table of Contents</a>
+        </h2>
+<nav class="toc"><ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
+            <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="auto internal xref">1</a>.  <a href="#name-introduction" class="internal xref">Introduction</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.1">
+                <p id="section-toc.1-1.1.2.1.1" class="keepWithNext"><a href="#section-1.1" class="auto internal xref">1.1</a>.  <a href="#name-terminology" class="internal xref">Terminology</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
+            <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-requirements-language" class="internal xref">Requirements Language</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
+            <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-use-cases" class="internal xref">Use Cases</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1">
+                <p id="section-toc.1-1.3.2.1.1"><a href="#section-3.1" class="auto internal xref">3.1</a>.  <a href="#name-initial-and-mobility-path-d" class="internal xref">Initial and Mobility Path Discovery</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2">
+                <p id="section-toc.1-1.3.2.2.1"><a href="#section-3.2" class="auto internal xref">3.2</a>.  <a href="#name-credential-free-operator-tr" class="internal xref">Credential-Free Operator Troubleshooting</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.3">
+                <p id="section-toc.1-1.3.2.3.1"><a href="#section-3.3" class="auto internal xref">3.3</a>.  <a href="#name-esp-blocked-or-filtered" class="internal xref">ESP Blocked or Filtered</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.4">
+                <p id="section-toc.1-1.3.2.4.1"><a href="#section-3.4" class="auto internal xref">3.4</a>.  <a href="#name-probing-multiple-paths" class="internal xref">Probing Multiple Paths</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.5">
+                <p id="section-toc.1-1.3.2.5.1"><a href="#section-3.5" class="auto internal xref">3.5</a>.  <a href="#name-probe-reply-path" class="internal xref">Probe Reply Path</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.6">
+                <p id="section-toc.1-1.3.2.6.1"><a href="#section-3.6" class="auto internal xref">3.6</a>.  <a href="#name-limitations-of-existing-ip-" class="internal xref">Limitations of Existing IP-Layer Tools</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.7">
+                <p id="section-toc.1-1.3.2.7.1"><a href="#section-3.7" class="auto internal xref">3.7</a>.  <a href="#name-inbound-traffic-monitoring-" class="internal xref">Inbound Traffic Monitoring for Liveness</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-relationship-with-rfc-9347" class="internal xref">Relationship with RFC 9347</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-protocol-specification" class="internal xref">Protocol Specification</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1">
+                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="auto internal xref">5.1</a>.  <a href="#name-traffic-selector-and-securi" class="internal xref">Traffic Selector and Security Policy Exemption</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
+                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="auto internal xref">5.2</a>.  <a href="#name-standalone-framing-and-ip-t" class="internal xref">Standalone Framing and IP-TFS Interaction</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.3">
+                <p id="section-toc.1-1.5.2.3.1"><a href="#section-5.3" class="auto internal xref">5.3</a>.  <a href="#name-esp-echo-payload-format" class="internal xref">ESP Echo Payload Format</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.4">
+                <p id="section-toc.1-1.5.2.4.1"><a href="#section-5.4" class="auto internal xref">5.4</a>.  <a href="#name-reply-path-processing-and-v" class="internal xref">Reply Path Processing and Validation</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.5">
+                <p id="section-toc.1-1.5.2.5.1"><a href="#section-5.5" class="auto internal xref">5.5</a>.  <a href="#name-unencrypted-mode-fixed-spi-" class="internal xref">Unencrypted Mode (Fixed SPI 7 and 8)</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.6">
+                <p id="section-toc.1-1.5.2.6.1"><a href="#section-5.6" class="auto internal xref">5.6</a>.  <a href="#name-behavior-under-udp-and-tcp-" class="internal xref">Behavior under UDP and TCP Encapsulation</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-ikev2-notification" class="internal xref">IKEv2 Notification</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-operational-considerations" class="internal xref">Operational Considerations</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
+            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
+            <p id="section-toc.1-1.10.1"><a href="#section-10" class="auto internal xref">10</a>. <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
+            <p id="section-toc.1-1.11.1"><a href="#section-11" class="auto internal xref">11</a>. <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12">
+            <p id="section-toc.1-1.12.1"><a href="#section-12" class="auto internal xref">12</a>. <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13">
+            <p id="section-toc.1-1.13.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
+</li>
+        </ul>
+</nav>
+</section>
+</div>
+<section id="section-1">
+      <h2 id="name-introduction">
+<a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
+      </h2>
+<p id="section-1-1">In response to the operational need for a data-plane failure-detection
+mechanism for IP Security (IPsec) Encapsulating Security Payload (ESP)
+from <span>[<a href="#RFC4303" class="cite xref">RFC4303</a>]</span>, this document introduces the ESP Echo Protocol,
+including Echo Request and Echo Reply messages. This protocol assesses
+network path reachability dynamically and can optionally specify a
+reply path for Echo Reply messages. Initiators can also send one-way
+probes without eliciting replies (e.g., for keepalives and NAT state
+maintenance) by clearing the Reply path flag.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">The approach for specifying a preferred reply path is inspired by
+Return Path Specified LSP Ping <span>[<a href="#RFC7110" class="cite xref">RFC7110</a>]</span>.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-3">This document defines both unencrypted and encrypted ESP Echo modes.
+The unencrypted mode is used outside the context of a negotiated ESP
+SA (for example, during MOBIKE <span>[<a href="#RFC4555" class="cite xref">RFC4555</a>]</span> address exploration or for
+credential-free diagnostics), using fixed SPI values (7 and 8) without
+encryption. The encrypted mode is used within the context of an
+established ESP SA using unique negotiated SPIs. In both modes,
+packets use Next Header 144 (AGGFRAG_PAYLOAD).<a href="#section-1-3" class="pilcrow">¶</a></p>
+<p id="section-1-4">This document updates <span>[<a href="#RFC9347" class="cite xref">RFC9347</a>]</span> by defining new AGGFRAG_PAYLOAD
+sub-types for ESP Echo Request and Reply, which operate independently
+of IP-TFS aggregation and do not require USE_AGGFRAG negotiation. This
+document also updates Section 2.1 of <span>[<a href="#RFC4303" class="cite xref">RFC4303</a>]</span> by defining the fixed
+SPI values 7 and 8 for unencrypted ESP Echo packets.<a href="#section-1-4" class="pilcrow">¶</a></p>
+<p id="section-1-5">This document does not specify a Path MTU discovery algorithm. It
+defines only the messaging layer, ESP Echo Request and Reply packets
+with a Data field, that an implementation can use as probe packets.
+How probes are sent and how the result is used are out of scope; see
+<span>[<a href="#RFC4821" class="cite xref">RFC4821</a>]</span> and <span>[<a href="#RFC8899" class="cite xref">RFC8899</a>]</span> for existing algorithms.<a href="#section-1-5" class="pilcrow">¶</a></p>
+<section id="section-1.1">
+        <h3 id="name-terminology">
+<a href="#section-1.1" class="section-number selfRef">1.1. </a><a href="#name-terminology" class="section-name selfRef">Terminology</a>
+        </h3>
+<p id="section-1.1-1">This document uses the following terms defined in <span>[<a href="#RFC4301" class="cite xref">RFC4301</a>]</span>:
+Encapsulating Security Payload (ESP), Security Association (SA),
+Security Policy Database (SPD).<a href="#section-1.1-1" class="pilcrow">¶</a></p>
+<p id="section-1.1-2">This document uses the following terms defined in <span>[<a href="#RFC9347" class="cite xref">RFC9347</a>]</span>: AGGFRAG
+tunnel, AGGFRAG_PAYLOAD.<a href="#section-1.1-2" class="pilcrow">¶</a></p>
+<p id="section-1.1-3">This document uses the term MOBIKE as defined in <span>[<a href="#RFC4555" class="cite xref">RFC4555</a>]</span>. In
+accordance with ICMP <span>[<a href="#RFC0792" class="cite xref">RFC0792</a>]</span>, messages sent to elicit an echo
+response are termed "Echo Request", and the corresponding reply
+messages are termed "Echo Reply".<a href="#section-1.1-3" class="pilcrow">¶</a></p>
+</section>
+</section>
+<section id="section-2">
+      <h2 id="name-requirements-language">
+<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-requirements-language" class="section-name selfRef">Requirements Language</a>
+      </h2>
+<p id="section-2-1">The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+"SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+"OPTIONAL" in this document are to be interpreted as described in BCP
+14 <span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</span> <span>[<a href="#RFC8174" class="cite xref">RFC8174</a>]</span> when, and only when, they appear in all
+capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶</a></p>
+</section>
+<section id="section-3">
+      <h2 id="name-use-cases">
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-use-cases" class="section-name selfRef">Use Cases</a>
+      </h2>
+<p id="section-3-1">Diagnosing operational problems in IPsec can be challenging. The ESP
+Echo Protocol addresses these challenges.<a href="#section-3-1" class="pilcrow">¶</a></p>
+<section id="section-3.1">
+        <h3 id="name-initial-and-mobility-path-d">
+<a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-initial-and-mobility-path-d" class="section-name selfRef">Initial and Mobility Path Discovery</a>
+        </h3>
+<p id="section-3.1-1">Prior to establishing an ESP SA, a node can verify whether the
+intermediate network permits ESP packets by sending an unencrypted ESP
+Echo Request. Depending on whether an ESP Echo Reply is received, the
+node can choose to enable UDP encapsulation, use a different IP
+protocol, or select an alternative server or interface. When using
+MOBIKE <span>[<a href="#RFC4555" class="cite xref">RFC4555</a>]</span>, a node can verify ESP reachability to a new
+candidate address before migrating the session, avoiding blackholing
+traffic.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
+</section>
+<section id="section-3.2">
+        <h3 id="name-credential-free-operator-tr">
+<a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-credential-free-operator-tr" class="section-name selfRef">Credential-Free Operator Troubleshooting</a>
+        </h3>
+<p id="section-3.2-1">Network operators can troubleshoot path reachability and MTU without
+requiring VPN or cryptographic credentials by sending unencrypted ESP
+Echo Requests. This allows enterprise support personnel to debug
+connectivity for guests independently, and enables operators to report
+path issues to transit ISPs along the routing path.<a href="#section-3.2-1" class="pilcrow">¶</a></p>
+</section>
+<section id="section-3.3">
+        <h3 id="name-esp-blocked-or-filtered">
+<a href="#section-3.3" class="section-number selfRef">3.3. </a><a href="#name-esp-blocked-or-filtered" class="section-name selfRef">ESP Blocked or Filtered</a>
+        </h3>
+<p id="section-3.3-1">An IPsec session typically employs ESP, using IP or IPv6 packets. ESP
+parameters are negotiated using IKEv2, with default IKEv2 messages
+exchanged over UDP port 500. In scenarios where ESP packets are not
+encapsulated in UDP (i.e., using the ESP protocol), successful IKE
+negotiation may occur, but ESP packets might fail to reach the peer
+due to differences in the packet path or filtering policies compared
+to IKE packets (e.g., UDP is allowed while ESP is filtered, typically
+due to misconfiguration). When using UDP encapsulation, intermediate
+middleboxes may apply different filtering policies to UDP-encapsulated
+ESP versus standard UDP traffic. Operational experience suggests that
+networks and some home routers that drop ESP packets are common enough
+to cause problems for general-purpose VPN applications that require
+reliable performance on the Internet. ESP Echo assists in diagnosing
+these scenarios. When IKEv2 operates over TCP to accommodate large
+post-quantum key exchanges while ESP may use a separate network path,
+ESP Echo can verify ESP reachability independently of the IKEv2
+control channel <span>[<a href="#I-D.ietf-ipsecme-ikev2-reliable-transport" class="cite xref">I-D.ietf-ipsecme-ikev2-reliable-transport</a>]</span>.<a href="#section-3.3-1" class="pilcrow">¶</a></p>
+</section>
+<section id="section-3.4">
+        <h3 id="name-probing-multiple-paths">
+<a href="#section-3.4" class="section-number selfRef">3.4. </a><a href="#name-probing-multiple-paths" class="section-name selfRef">Probing Multiple Paths</a>
+        </h3>
+<p id="section-3.4-1">When there are multiple paths created using multiple Child SAs with
+identical Traffic Selectors as specified in <span>[<a href="#RFC7296" class="cite xref">RFC7296</a>]</span>, there is a
+need to probe each Child SA, including the network path, independently
+from an IPsec peer. Each SA may traverse different network paths and
+may have different policies. ESP Echo determines the
+reachability of each path independently.<a href="#section-3.4-1" class="pilcrow">¶</a></p>
+</section>
+<section id="section-3.5">
+        <h3 id="name-probe-reply-path">
+<a href="#section-3.5" class="section-number selfRef">3.5. </a><a href="#name-probe-reply-path" class="section-name selfRef">Probe Reply Path</a>
+        </h3>
+<p id="section-3.5-1">IPsec Security Associations (SAs) are negotiated as a pair of
+unidirectional SAs. When an initiator sends an ESP Echo Request to
+elicit a reply, it sets the Reply path flag (R=1) and explicitly
+specifies the target Reply path SPI on which the peer is to transmit
+the Echo Reply.<a href="#section-3.5-1" class="pilcrow">¶</a></p>
+<p id="section-3.5-2">This explicit specification enables probing across multi-SA
+deployments, such as multiple Child SAs with identical Traffic
+Selectors (<span>[<a href="#RFC7296" class="cite xref">RFC7296</a>]</span> Section 2.9), per-CPU SAs, or primary and
+secondary paths.<a href="#section-3.5-2" class="pilcrow">¶</a></p>
+<p id="section-3.5-3">The responder SHOULD reply via the specified IPsec SA, though the final
+choice remains subject to local policy. If the responder sends the reply
+via a different path, the initiator can detect this mismatch and report
+it.<a href="#section-3.5-3" class="pilcrow">¶</a></p>
+<p id="section-3.5-4">Conversely, clearing the Reply path flag (R=0) allows initiators to send
+one-way ESP packets without eliciting replies, enabling lightweight
+keepalives, NAT and firewall pinhole maintenance, and cryptographic
+sequence advancement without return traffic.<a href="#section-3.5-4" class="pilcrow">¶</a></p>
+</section>
+<section id="section-3.6">
+        <h3 id="name-limitations-of-existing-ip-">
+<a href="#section-3.6" class="section-number selfRef">3.6. </a><a href="#name-limitations-of-existing-ip-" class="section-name selfRef">Limitations of Existing IP-Layer Tools</a>
+        </h3>
+<p id="section-3.6-1">Existing tools such as ICMP ping or traceroute assume IP connectivity.
+However, in IPsec gateway setups, the gateway itself may not have an
+IP address that matches the IPsec Security Policy Database (SPD). A
+peer MUST accept ESP Echo messages even when it does not
+match a local SPD.<a href="#section-3.6-1" class="pilcrow">¶</a></p>
+<p id="section-3.6-2">Standard IP diagnostic tools cannot target specific IPsec SAs when
+exploring multiple paths between the same endpoints.<a href="#section-3.6-2" class="pilcrow">¶</a></p>
+</section>
+<section id="section-3.7">
+        <h3 id="name-inbound-traffic-monitoring-">
+<a href="#section-3.7" class="section-number selfRef">3.7. </a><a href="#name-inbound-traffic-monitoring-" class="section-name selfRef">Inbound Traffic Monitoring for Liveness</a>
+        </h3>
+<p id="section-3.7-1">Outgoing probes alone do not cover IPsec path health; incoming traffic
+must also be monitored. Incoming per-SA byte and packet counters
+maintained by IPsec are cryptographically verified: a counter can only
+increment if a valid authenticated ESP packet was received. These
+counters reliably indicate a viable path. This should be taken into
+account when probing IPsec paths. For example, when the crypto
+subsystem is overloaded, the responder may miss out on ESP Echo
+replies. Tracking the incoming traffic after the ping probe is
+sent allows applications to confirm the IPsec path is still viable.<a href="#section-3.7-1" class="pilcrow">¶</a></p>
+</section>
+</section>
+<section id="section-4">
+      <h2 id="name-relationship-with-rfc-9347">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-relationship-with-rfc-9347" class="section-name selfRef">Relationship with RFC 9347</a>
+      </h2>
+<p id="section-4-1">IP Traffic Flow Security (IP-TFS) <span>[<a href="#RFC9347" class="cite xref">RFC9347</a>]</span> utilizes Next Header 144
+(AGGFRAG_PAYLOAD) and defines a Congestion Control payload (sub-type 1)
+to measure round-trip time and packet loss within an active IP-TFS
+tunnel. The ESP Echo Protocol defined in this document also uses Next
+Header 144, defining dedicated Echo Request and Reply sub-types
+(sub-types [TBD2] and [TBD3]). The ESP Echo Protocol can be deployed in
+addition to active IP-TFS tunnels, or used independently across standard
+ESP SAs and unencrypted links.<a href="#section-4-1" class="pilcrow">¶</a></p>
+<p id="section-4-2">To determine which mechanism to use:<a href="#section-4-2" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-4-3.1">
+          <p id="section-4-3.1.1"><strong>When either can be used</strong>: For basic link reachability checks and
+round-trip time measurement over an established, active IP-TFS tunnel
+(<span>[<a href="#RFC9347" class="cite xref">RFC9347</a>]</span>), either mechanism can be used. When using RFC 9347
+Congestion Control payloads specifically as echo probes, they MUST be
+sent as independent ESP frames without concatenating other IPv4 or
+IPv6 data blocks.<a href="#section-4-3.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-4-3.2">
+          <p id="section-4-3.2.1"><strong>When to use RFC 9347 Congestion Control</strong>: Use Congestion Control
+payloads when operating an active IP-TFS tunnel to provide real-time
+loss and delay feedback for IP-TFS rate adaptation algorithms.<a href="#section-4-3.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-4-3.3">
+          <p id="section-4-3.3.1"><strong>When to use ESP Echo</strong>: Use the ESP Echo Protocol when verifying
+reachability, liveness, or probing Path MTU on standard (non-IP-TFS)
+ESP SAs;
+when probing specific return paths across multiple SAs; when sending
+unidirectional keepalives or maintaining NAT state without eliciting
+replies (R=0); or when probing unencrypted paths prior to SA
+negotiation (SPI 7 and 8).<a href="#section-4-3.3.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="section-4-4">Unlike normal IP-TFS operation where Congestion Control payloads are
+multiplexed directly into the aggregation stream, ESP Echo packets are
+always transmitted as standalone ESP control frames and MUST NOT be
+aggregated or fragmented with user data.<a href="#section-4-4" class="pilcrow">¶</a></p>
+</section>
+<section id="section-5">
+      <h2 id="name-protocol-specification">
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-protocol-specification" class="section-name selfRef">Protocol Specification</a>
+      </h2>
+<p id="section-5-1">The ESP Echo Protocol operates in two modes:<a href="#section-5-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-5-2.1">
+          <p id="section-5-2.1.1"><strong>Encrypted Mode</strong>: Used over established IPsec Security Associations
+(SAs) <span>[<a href="#RFC7296" class="cite xref">RFC7296</a>]</span>, where echo packets receive the same cryptographic
+protection as other traffic on the SA.<a href="#section-5-2.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-5-2.2">
+          <p id="section-5-2.2.1"><strong>Unencrypted Mode</strong>: Used outside the context of a negotiated ESP SA
+using fixed SPI values 7 (Request) and 8 (Reply) without encryption
+(Section 5.5).<a href="#section-5-2.2.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="section-5-3">In both modes, an endpoint MAY send an ESP Echo Request to assess path
+reachability, probe path MTU, or maintain middlebox state.<a href="#section-5-3" class="pilcrow">¶</a></p>
+<p id="section-5-4">The ESP Next Header MUST be set to AGGFRAG_PAYLOAD (144) <span>[<a href="#RFC9347" class="cite xref">RFC9347</a>]</span>,
+carrying the ESP Echo payload format defined in Section 5.3, including
+optional Data.<a href="#section-5-4" class="pilcrow">¶</a></p>
+<p id="section-5-5">When an incoming request has the Reply path flag set (R=1), the receiving
+peer SHOULD reply on the specified SPI using an ESP packet with Next
+Header 144 (AGGFRAG_PAYLOAD) and the ESP Echo Reply payload. When R=0,
+the receiver MUST NOT reply.<a href="#section-5-5" class="pilcrow">¶</a></p>
+<section id="section-5.1">
+        <h3 id="name-traffic-selector-and-securi">
+<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-traffic-selector-and-securi" class="section-name selfRef">Traffic Selector and Security Policy Exemption</a>
+        </h3>
+<p id="section-5.1-1">Under standard <span>[<a href="#RFC4301" class="cite xref">RFC4301</a>]</span> inbound processing, decrypted ESP packets
+are verified against the Security Policy Database (SPD) traffic
+selectors associated with the SA. Because Next Header 144
+(AGGFRAG_PAYLOAD) control messages---including all ESP Echo Request
+and Reply payloads defined in this document---are non-IP control
+messages without inner IP headers or traffic addresses, they MUST NOT
+be subjected to inbound SPD traffic selector verification. This
+exemption applies equally to Encrypted Mode (Section 5.3) and
+Unencrypted Mode (Section 5.5) ESP Echo payloads.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
+</section>
+<section id="section-5.2">
+        <h3 id="name-standalone-framing-and-ip-t">
+<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-standalone-framing-and-ip-t" class="section-name selfRef">Standalone Framing and IP-TFS Interaction</a>
+        </h3>
+<p id="section-5.2-1">ESP Echo Request and Reply packets are standalone control messages.
+When transmitting ESP Echo packets, implementations MUST NOT aggregate
+or fragment ESP Echo payloads with IP-TFS data blocks or other AGGFRAG
+sub-types. Each ESP Echo packet MUST be carried in its own dedicated
+ESP packet with Next Header set to 144 (AGGFRAG_PAYLOAD).<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+</section>
+<section id="section-5.3">
+        <h3 id="name-esp-echo-payload-format">
+<a href="#section-5.3" class="section-number selfRef">5.3. </a><a href="#name-esp-echo-payload-format" class="section-name selfRef">ESP Echo Payload Format</a>
+        </h3>
+<p id="section-5.3-1">The ESP Echo payload format consists of a fixed 12-octet header followed
+by optional Data:<a href="#section-5.3-1" class="pilcrow">¶</a></p>
+<span id="name-esp-echo-payload-format-2"></span><div id="echo-echo-payload">
+<figure id="figure-1">
+          <div class="sourcecode" id="section-5.3-2.1">
+<pre>
+
+                    1                   2                   3
+0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|   Sub-type    |R|  Reserved   |          Data Length          |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|        Identifier (ID)        |        Sequence Number        |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+| Reply path SPI                                                |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+| Data ...
++-+-+-+-+-+-+-+-+-+-+-
+</pre>
+</div>
+<figcaption><a href="#figure-1" class="selfRef">Figure 1</a>:
+<a href="#name-esp-echo-payload-format-2" class="selfRef">ESP Echo Payload Format</a>
+          </figcaption></figure>
+</div>
+<ul class="normal">
+<li class="normal" id="section-5.3-3.1">
+            <p id="section-5.3-3.1.1">Sub-Type: ECHO-REQUEST or ECHO-REPLY<a href="#section-5.3-3.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-5.3-3.2">
+            <p id="section-5.3-3.2.1">Reply path (R): 1-bit flag. Set to 1 to request an Echo Reply; set to 0
+when no reply is requested.<a href="#section-5.3-3.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-5.3-3.3">
+            <p id="section-5.3-3.3.1">Reserved: 7 bits<a href="#section-5.3-3.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-5.3-3.4">
+            <p id="section-5.3-3.4.1">Data Length: Length of the following Data field in octets (16 bits)<a href="#section-5.3-3.4.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-5.3-3.5">
+            <p id="section-5.3-3.5.1">Identifier: A 16-bit request identifier. The identifier SHOULD be set
+to a unique value to distinguish between different ESP Request
+sessions. The responder copies it from the request.<a href="#section-5.3-3.5.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-5.3-3.6">
+            <p id="section-5.3-3.6.1">Sequence number: A 16-bit field that increments with each echo
+request sent.<a href="#section-5.3-3.6.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-5.3-3.7">
+            <p id="section-5.3-3.7.1">Reply path SPI: 32 bits. When R=1, specifies the target SPI for the
+reply, or 0 to let the responder reply on any SA to the peer. When
+R=0, the sender SHOULD set it to 0 and the receiver MUST ignore it.<a href="#section-5.3-3.7.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-5.3-3.8">
+            <p id="section-5.3-3.8.1">Data: Zero or more octets of arbitrary data that follows the header.
+In an Echo Reply, this data is copied from the request up to the reply
+path MTU.<a href="#section-5.3-3.8.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-5.3-4">The ESP trailer MUST be constructed using the minimum allowable padding
+required by the cipher algorithm and <span>[<a href="#RFC4303" class="cite xref">RFC4303</a>]</span>. In unencrypted mode
+(<span>[<a href="#RFC2410" class="cite xref">RFC2410</a>]</span>), the padding length MUST NOT exceed 3 octets.<a href="#section-5.3-4" class="pilcrow">¶</a></p>
+</section>
+<section id="section-5.4">
+        <h3 id="name-reply-path-processing-and-v">
+<a href="#section-5.4" class="section-number selfRef">5.4. </a><a href="#name-reply-path-processing-and-v" class="section-name selfRef">Reply Path Processing and Validation</a>
+        </h3>
+<p id="section-5.4-1">When R=1, the Reply path SPI field MUST specify the target SPI for the
+reply. For unencrypted requests (outer SPI 7), the Reply path SPI MUST
+be set to 8 (ESP-ECHO-REPLY) or 0, and the responder MUST send the Echo
+Reply with outer SPI 8 in either case. If an unencrypted request on SPI 7 has R=1 and the
+Reply path SPI is neither 8 nor 0, the responder MUST treat this as a
+protocol error and MUST NOT reply.<a href="#section-5.4-1" class="pilcrow">¶</a></p>
+<p id="section-5.4-2">For encrypted requests, the Reply path SPI identifies the SA on which the
+initiator expects to receive the Echo Reply. The initiator MUST set it to
+the SPI of an inbound SA that it has established with the responder, that
+is, an SA whose SPI the initiator allocated and which is present in its
+local SAD for that peer. An initiator that does not care which SA carries
+the reply sets R=1 and the Reply path SPI to 0; the responder then MAY
+send the Echo Reply on any established outbound SA to the initiator,
+preferring the SA paired with the one on which the request was received.
+For any other Reply path SPI value, the responder MUST validate the requested Reply
+path SPI against its own SAD: the SPI is acceptable only if it identifies
+an established outbound SA from the responder to the initiator. If it
+does, the responder SHOULD send the Echo Reply on that SA. Otherwise the
+responder MUST NOT send the reply on that SPI, to prevent amplification
+and reflection to unrelated peers, though it MAY reply on the SA paired
+with the one on which the request was received.<a href="#section-5.4-2" class="pilcrow">¶</a></p>
+<p id="section-5.4-3">When R=0, the responder MUST NOT reply, and any value in the Reply path
+SPI field MUST be ignored.<a href="#section-5.4-3" class="pilcrow">¶</a></p>
+<p id="section-5.4-4">When replying (R=1), the responder SHOULD copy the request message and
+MUST change the Sub-type to ECHO-REPLY; if the responder copies the
+request message, it MUST copy up to the reply path MTU.<a href="#section-5.4-4" class="pilcrow">¶</a></p>
+</section>
+<section id="section-5.5">
+        <h3 id="name-unencrypted-mode-fixed-spi-">
+<a href="#section-5.5" class="section-number selfRef">5.5. </a><a href="#name-unencrypted-mode-fixed-spi-" class="section-name selfRef">Unencrypted Mode (Fixed SPI 7 and 8)</a>
+        </h3>
+<p id="section-5.5-1">An IPv4 or IPv6 node that desires to determine whether the path to a
+particular destination supports ESP packets outside the context of a
+negotiated ESP SA sends an unencrypted ESP Echo Request packet to that
+destination. In this mode, packets use the standard ESP packet format
+described in Section 2 of <span>[<a href="#RFC4303" class="cite xref">RFC4303</a>]</span> with the NULL encryption algorithm
+<span>[<a href="#RFC2410" class="cite xref">RFC2410</a>]</span> and no integrity protection (AUTH_NONE <span>[<a href="#RFC7296" class="cite xref">RFC7296</a>]</span>):<a href="#section-5.5-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-5.5-2.1">
+            <p id="section-5.5-2.1.1">The SPI field MUST be set to 7 (ESP-ECHO-REQUEST) for requests and 8
+(ESP-ECHO-REPLY) for replies.<a href="#section-5.5-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-5.5-2.2">
+            <p id="section-5.5-2.2.1">The Next Header field in the ESP trailer MUST be set to 144
+(AGGFRAG_PAYLOAD).<a href="#section-5.5-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-5.5-2.3">
+            <p id="section-5.5-2.3.1">Under NULL encryption <span>[<a href="#RFC2410" class="cite xref">RFC2410</a>]</span> and no integrity protection
+(<span>[<a href="#RFC4303" class="cite xref">RFC4303</a>]</span> Section 2.7), the Initialization Vector (IV) and
+Integrity Check Value (ICV) fields are omitted (0 octets in length).<a href="#section-5.5-2.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-5.5-2.4">
+            <p id="section-5.5-2.4.1">The ESP Sequence Number SHOULD be set to 0, and replay protection
+MUST NOT be enabled.<a href="#section-5.5-2.4.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-5.5-2.5">
+            <p id="section-5.5-2.5.1">The ESP trailer contains 0 to 3 octets of Padding as needed to align
+the trailer to a 4-octet boundary <span>[<a href="#RFC2410" class="cite xref">RFC2410</a>]</span>, followed by a 1-octet
+Pad Length and the 1-octet Next Header (144).<a href="#section-5.5-2.5.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-5.5-3">The inner payload utilizes the same fixed format defined in Section
+5.3. When requesting an unencrypted Echo Reply, the sender sets the
+Reply path flag (R=1) and sets the Reply path SPI field to 8
+(ESP-ECHO-REPLY). To send a one-way unencrypted probe without eliciting
+a reply, the sender sets R=0, and the Reply path SPI field is ignored by
+the receiver. Senders MAY include arbitrary data in the Data field up to
+the path MTU to verify large packet transmission; when R=1, the responder
+SHOULD copy the request data up to the reply path MTU.<a href="#section-5.5-3" class="pilcrow">¶</a></p>
+<p id="section-5.5-4">When no reply is received, a sender MUST NOT conclude that the network
+path is unable to transmit ESP packets. The absence of a reply can be
+caused by any of the following:<a href="#section-5.5-4" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-5.5-5.1">
+            <p id="section-5.5-5.1.1">The remote peer does not support the ESP Echo Protocol (or local
+policy chooses not to reply).<a href="#section-5.5-5.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-5.5-5.2">
+            <p id="section-5.5-5.2.1">The network path does not support ESP packets (e.g., protocol 50 is
+dropped by intermediate middleboxes or firewalls).<a href="#section-5.5-5.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-5.5-5.3">
+            <p id="section-5.5-5.3.1">Intermediate network nodes permit regular ESP traffic with
+operational negotiated SPIs, but drop ESP packets with reserved SPI
+values (7 or 8).<a href="#section-5.5-5.3.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-5.5-6">Senders SHOULD still attempt to establish standard ESP Security
+Associations if no alternative paths or protocols are available.<a href="#section-5.5-6" class="pilcrow">¶</a></p>
+<p id="section-5.5-7">Because unencrypted ESP Echo packets operate outside the context of a
+negotiated ESP SA, receivers MUST NOT require a dynamically negotiated
+Security Association to accept and process incoming packets with SPI
+values 7 and 8 (arriving over raw ESP protocol 50 or UDP/TCP
+encapsulation). Implementations MAY process these packets directly or
+MAY utilize static SADB entries configured with NULL encryption
+(<span>[<a href="#RFC2410" class="cite xref">RFC2410</a>]</span>) and no authentication to maintain administrative, policy,
+or rate-limiting information for unencrypted probing.<a href="#section-5.5-7" class="pilcrow">¶</a></p>
+</section>
+<section id="section-5.6">
+        <h3 id="name-behavior-under-udp-and-tcp-">
+<a href="#section-5.6" class="section-number selfRef">5.6. </a><a href="#name-behavior-under-udp-and-tcp-" class="section-name selfRef">Behavior under UDP and TCP Encapsulation</a>
+        </h3>
+<p id="section-5.6-1">There is no distinction between ESP Echo packets and other ESP packets
+for the purposes of processing encapsulation under <span>[<a href="#RFC3948" class="cite xref">RFC3948</a>]</span> (UDP
+encapsulation) and <span>[<a href="#RFC8229" class="cite xref">RFC8229</a>]</span> (TCP encapsulation).<a href="#section-5.6-1" class="pilcrow">¶</a></p>
+<p id="section-5.6-2">If an implementation is capable of receiving UDP or TCP encapsulated
+packets, it SHOULD accept encapsulated ESP packets with SPI values 7
+and 8 on either, without the negotiation of an SA.<a href="#section-5.6-2" class="pilcrow">¶</a></p>
+<p id="section-5.6-3">When TCP encapsulation is used <span>[<a href="#RFC8229" class="cite xref">RFC8229</a>]</span>, path MTU discovery is
+ineffective. Because TCP segments and reassembles stream traffic,
+packets exceeding the path MTU are segmented rather than dropped by
+network bottlenecks. Consequently, over TCP encapsulation, ESP Echo
+functions as an SA reachability and liveness check rather than an MTU
+probe.<a href="#section-5.6-3" class="pilcrow">¶</a></p>
+</section>
+</section>
+<section id="section-6">
+      <h2 id="name-ikev2-notification">
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-ikev2-notification" class="section-name selfRef">IKEv2 Notification</a>
+      </h2>
+<p id="section-6-1">A peer announces support for the ESP Echo Protocol by including the
+Notification Status Type `ESP_ECHO_SUPPORTED` in the IKE_AUTH exchange
+during IKEv2 negotiation <span>[<a href="#RFC7296" class="cite xref">RFC7296</a>]</span>.<a href="#section-6-1" class="pilcrow">¶</a></p>
+<p id="section-6-2">When `ESP_ECHO_SUPPORTED` has been negotiated, the peer SHOULD reply to
+ESP Echo Requests received on all Child SAs established under the IKE
+SA. The initiator can reliably interpret the absence of a reply after a
+configurable timeout as an indication of path failure.<a href="#section-6-2" class="pilcrow">¶</a></p>
+</section>
+<section id="section-7">
+      <h2 id="name-iana-considerations">
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+      </h2>
+<p id="section-7-1">This document requests that IANA allocate two new values from the
+"Security Parameters Index (SPI)" registry:<a href="#section-7-1" class="pilcrow">¶</a></p>
+<div class="sourcecode" id="section-7-2">
+<pre>
+
+Number   Description         Reference
+------   -----------------   ---------------
+7        ESP-ECHO-REQUEST    [this document]
+8        ESP-ECHO-REPLY      [this document]
+
+</pre><a href="#section-7-2" class="pilcrow">¶</a>
+</div>
+<p id="section-7-3">This document defines two new registrations for the IANA ESP
+<span>[<a href="#AGGFRAG" class="cite xref">AGGFRAG</a>]</span> PAYLOAD Sub-Types.<a href="#section-7-3" class="pilcrow">¶</a></p>
+<div class="sourcecode" id="section-7-4">
+<pre>
+
+Value   ESP AGGFRAG_PAYLOAD Sub-Type       Reference
+-----   ------------------------------    ---------------
+[TBD2]  ECHO-REQUEST                  [this document]
+[TBD3]  ECHO-REPLY                    [this document]
+
+</pre><a href="#section-7-4" class="pilcrow">¶</a>
+</div>
+<p id="section-7-5">This document defines one new registration for the IANA "IKEv2 Notify
+Message Status Types" <span>[<a href="#STATUSNOTIFY" class="cite xref">STATUSNOTIFY</a>]</span>.<a href="#section-7-5" class="pilcrow">¶</a></p>
+<div class="sourcecode" id="section-7-6">
+<pre>
+
+Value     Notify Message Status Type      Reference
+-------  ----------------------------    ---------------
+[TBD1]    ESP_ECHO_SUPPORTED.       [this document]
+
+</pre><a href="#section-7-6" class="pilcrow">¶</a>
+</div>
+</section>
+<section id="section-8">
+      <h2 id="name-operational-considerations">
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-operational-considerations" class="section-name selfRef">Operational Considerations</a>
+      </h2>
+<p id="section-8-1">When an explicit reply path is requested, the ESP Echo responder
+SHOULD make best effort to reply via this path; however, if local
+policies do not allow this, it MAY reply via another SA.<a href="#section-8-1" class="pilcrow">¶</a></p>
+<p id="section-8-2">A typical implementation can create an ESP Echo socket with an assigned
+outgoing SPI and matched source and destination addresses. Applications
+can then transmit ESP Echo Request payloads directly over the socket.<a href="#section-8-2" class="pilcrow">¶</a></p>
+<p id="section-8-3">For unencrypted probing using SPIs 7 and 8, packet capture tools on
+security gateways can filter specifically for these SPI values to
+debug transit reachability and MTU without decrypting user traffic.<a href="#section-8-3" class="pilcrow">¶</a></p>
+</section>
+<section id="section-9">
+      <h2 id="name-acknowledgments">
+<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-acknowledgments" class="section-name selfRef">Acknowledgments</a>
+      </h2>
+<p id="section-9-1">The authors thank Tero Kivinen, Andrew McGregor, Valery Smyslov, and
+Paul Wouters for their thorough reviews and comments.<a href="#section-9-1" class="pilcrow">¶</a></p>
+</section>
+<section id="section-10">
+      <h2 id="name-security-considerations">
+<a href="#section-10" class="section-number selfRef">10. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+      </h2>
+<p id="section-10-1">The security considerations are similar to other request-reply
+protocols such as ICMP. ESP Echo does not enable amplification attacks
+because an Echo Reply is never larger than the corresponding Echo
+Request. It can also be rate limited or filtered using ingress
+filtering per BCP 38 <span>[<a href="#RFC2827" class="cite xref">RFC2827</a>]</span>.<a href="#section-10-1" class="pilcrow">¶</a></p>
+<p id="section-10-2">To prevent downgrade attacks where security is compromised, IPsec
+nodes MUST NOT fall back to unencrypted plaintext communication if ESP
+Echo probing fails; nodes MAY attempt session migration (e.g., via
+MOBIKE) or switch to UDP encapsulation. In unencrypted mode,
+intermediate nodes might selectively permit or forge packets with SPI
+7 or 8; however, within an established ESP SA, Encrypted Mode
+cryptographically authenticates all echo requests and replies.<a href="#section-10-2" class="pilcrow">¶</a></p>
+</section>
+<section id="section-11">
+      <h2 id="name-normative-references">
+<a href="#section-11" class="section-number selfRef">11. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+      </h2>
+<dl class="references">
+<dt id="AGGFRAG">[AGGFRAG]</dt>
+      <dd>
+<span class="refAuthor">IANA</span>, <span class="refTitle">"ESP AGGFRAG_PAYLOAD Registry"</span>, <span>&lt;<a href="https://www.iana.org/assignments/esp-aggfrag-payload/esp-aggfrag-payload.xhtml">https://www.iana.org/assignments/esp-aggfrag-payload/esp-aggfrag-payload.xhtml</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC0792">[RFC0792]</dt>
+      <dd>
+<span class="refAuthor">Postel, J.</span>, <span class="refTitle">"Internet Control Message Protocol"</span>, <span class="seriesInfo">STD 5</span>, <span class="seriesInfo">RFC 792</span>, <span class="seriesInfo">DOI 10.17487/RFC792</span>, <time datetime="1981-09" class="refDate">September 1981</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc792">https://www.rfc-editor.org/info/rfc792</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC2119">[RFC2119]</dt>
+      <dd>
+<span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc2119">https://www.rfc-editor.org/info/rfc2119</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC2410">[RFC2410]</dt>
+      <dd>
+<span class="refAuthor">Glenn, R.</span> and <span class="refAuthor">S. Kent</span>, <span class="refTitle">"The NULL Encryption Algorithm and Its Use With IPsec"</span>, <span class="seriesInfo">RFC 2410</span>, <span class="seriesInfo">DOI 10.17487/RFC2410</span>, <time datetime="1998-11" class="refDate">November 1998</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc2410">https://www.rfc-editor.org/info/rfc2410</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC2827">[RFC2827]</dt>
+      <dd>
+<span class="refAuthor">Ferguson, P.</span> and <span class="refAuthor">D. Senie</span>, <span class="refTitle">"Network Ingress Filtering: Defeating Denial of Service Attacks which employ IP Source Address Spoofing"</span>, <span class="seriesInfo">BCP 38</span>, <span class="seriesInfo">RFC 2827</span>, <span class="seriesInfo">DOI 10.17487/RFC2827</span>, <time datetime="2000-05" class="refDate">May 2000</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc2827">https://www.rfc-editor.org/info/rfc2827</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC4301">[RFC4301]</dt>
+      <dd>
+<span class="refAuthor">Kent, S.</span> and <span class="refAuthor">K. Seo</span>, <span class="refTitle">"Security Architecture for the Internet Protocol"</span>, <span class="seriesInfo">RFC 4301</span>, <span class="seriesInfo">DOI 10.17487/RFC4301</span>, <time datetime="2005-12" class="refDate">December 2005</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc4301">https://www.rfc-editor.org/info/rfc4301</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC4303">[RFC4303]</dt>
+      <dd>
+<span class="refAuthor">Kent, S.</span>, <span class="refTitle">"IP Encapsulating Security Payload (ESP)"</span>, <span class="seriesInfo">RFC 4303</span>, <span class="seriesInfo">DOI 10.17487/RFC4303</span>, <time datetime="2005-12" class="refDate">December 2005</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc4303">https://www.rfc-editor.org/info/rfc4303</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC7296">[RFC7296]</dt>
+      <dd>
+<span class="refAuthor">Kaufman, C.</span>, <span class="refAuthor">Hoffman, P.</span>, <span class="refAuthor">Nir, Y.</span>, <span class="refAuthor">Eronen, P.</span>, and <span class="refAuthor">T. Kivinen</span>, <span class="refTitle">"Internet Key Exchange Protocol Version 2 (IKEv2)"</span>, <span class="seriesInfo">STD 79</span>, <span class="seriesInfo">RFC 7296</span>, <span class="seriesInfo">DOI 10.17487/RFC7296</span>, <time datetime="2014-10" class="refDate">October 2014</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc7296">https://www.rfc-editor.org/info/rfc7296</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8174">[RFC8174]</dt>
+      <dd>
+<span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8174">https://www.rfc-editor.org/info/rfc8174</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9347">[RFC9347]</dt>
+      <dd>
+<span class="refAuthor">Hopps, C.</span>, <span class="refTitle">"Aggregation and Fragmentation Mode for Encapsulating Security Payload (ESP) and Its Use for IP Traffic Flow Security (IP-TFS)"</span>, <span class="seriesInfo">RFC 9347</span>, <span class="seriesInfo">DOI 10.17487/RFC9347</span>, <time datetime="2023-01" class="refDate">January 2023</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc9347">https://www.rfc-editor.org/info/rfc9347</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="STATUSNOTIFY">[STATUSNOTIFY]</dt>
+    <dd>
+<span class="refAuthor">IANA</span>, <span class="refTitle">"IKEv2 Notify Message Status Types"</span>, <span>&lt;<a href="https://www.iana.org/assignments/ikev2-parameters/ikev2-parameters.xhtml#ikev2-parameters-16">https://www.iana.org/assignments/ikev2-parameters/ikev2-parameters.xhtml#ikev2-parameters-16</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+<section id="section-12">
+      <h2 id="name-informative-references">
+<a href="#section-12" class="section-number selfRef">12. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+      </h2>
+<dl class="references">
+<dt id="I-D.ietf-ipsecme-ikev2-reliable-transport">[I-D.ietf-ipsecme-ikev2-reliable-transport]</dt>
+      <dd>
+<span class="refAuthor">Smyslov, V.</span> and <span class="refAuthor">T. Reddy.K</span>, <span class="refTitle">"Separate Transports for IKE and ESP"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-ipsecme-ikev2-reliable-transport-07</span>, <time datetime="2026-08-10" class="refDate">10 August 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-ipsecme-ikev2-reliable-transport-07">https://datatracker.ietf.org/doc/html/draft-ietf-ipsecme-ikev2-reliable-transport-07</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC3948">[RFC3948]</dt>
+      <dd>
+<span class="refAuthor">Huttunen, A.</span>, <span class="refAuthor">Swander, B.</span>, <span class="refAuthor">Volpe, V.</span>, <span class="refAuthor">DiBurro, L.</span>, and <span class="refAuthor">M. Stenberg</span>, <span class="refTitle">"UDP Encapsulation of IPsec ESP Packets"</span>, <span class="seriesInfo">RFC 3948</span>, <span class="seriesInfo">DOI 10.17487/RFC3948</span>, <time datetime="2005-01" class="refDate">January 2005</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc3948">https://www.rfc-editor.org/info/rfc3948</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC4555">[RFC4555]</dt>
+      <dd>
+<span class="refAuthor">Eronen, P.</span>, <span class="refTitle">"IKEv2 Mobility and Multihoming Protocol (MOBIKE)"</span>, <span class="seriesInfo">RFC 4555</span>, <span class="seriesInfo">DOI 10.17487/RFC4555</span>, <time datetime="2006-06" class="refDate">June 2006</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc4555">https://www.rfc-editor.org/info/rfc4555</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC4787">[RFC4787]</dt>
+      <dd>
+<span class="refAuthor">Audet, F., Ed.</span> and <span class="refAuthor">C. Jennings</span>, <span class="refTitle">"Network Address Translation (NAT) Behavioral Requirements for Unicast UDP"</span>, <span class="seriesInfo">BCP 127</span>, <span class="seriesInfo">RFC 4787</span>, <span class="seriesInfo">DOI 10.17487/RFC4787</span>, <time datetime="2007-01" class="refDate">January 2007</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc4787">https://www.rfc-editor.org/info/rfc4787</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC4821">[RFC4821]</dt>
+      <dd>
+<span class="refAuthor">Mathis, M.</span> and <span class="refAuthor">J. Heffner</span>, <span class="refTitle">"Packetization Layer Path MTU Discovery"</span>, <span class="seriesInfo">RFC 4821</span>, <span class="seriesInfo">DOI 10.17487/RFC4821</span>, <time datetime="2007-03" class="refDate">March 2007</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc4821">https://www.rfc-editor.org/info/rfc4821</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC6092">[RFC6092]</dt>
+      <dd>
+<span class="refAuthor">Woodyatt, J., Ed.</span>, <span class="refTitle">"Recommended Simple Security Capabilities in Customer Premises Equipment (CPE) for Providing Residential IPv6 Internet Service"</span>, <span class="seriesInfo">RFC 6092</span>, <span class="seriesInfo">DOI 10.17487/RFC6092</span>, <time datetime="2011-01" class="refDate">January 2011</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc6092">https://www.rfc-editor.org/info/rfc6092</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC7110">[RFC7110]</dt>
+      <dd>
+<span class="refAuthor">Chen, M.</span>, <span class="refAuthor">Cao, W.</span>, <span class="refAuthor">Ning, S.</span>, <span class="refAuthor">Jounay, F.</span>, and <span class="refAuthor">S. Delord</span>, <span class="refTitle">"Return Path Specified Label Switched Path (LSP) Ping"</span>, <span class="seriesInfo">RFC 7110</span>, <span class="seriesInfo">DOI 10.17487/RFC7110</span>, <time datetime="2014-01" class="refDate">January 2014</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc7110">https://www.rfc-editor.org/info/rfc7110</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8229">[RFC8229]</dt>
+      <dd>
+<span class="refAuthor">Pauly, T.</span>, <span class="refAuthor">Touati, S.</span>, and <span class="refAuthor">R. Mantha</span>, <span class="refTitle">"TCP Encapsulation of IKE and IPsec Packets"</span>, <span class="seriesInfo">RFC 8229</span>, <span class="seriesInfo">DOI 10.17487/RFC8229</span>, <time datetime="2017-08" class="refDate">August 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8229">https://www.rfc-editor.org/info/rfc8229</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8899">[RFC8899]</dt>
+    <dd>
+<span class="refAuthor">Fairhurst, G.</span>, <span class="refAuthor">Jones, T.</span>, <span class="refAuthor">Tüxen, M.</span>, <span class="refAuthor">Rüngeler, I.</span>, and <span class="refAuthor">T. Völker</span>, <span class="refTitle">"Packetization Layer Path MTU Discovery for Datagram Transports"</span>, <span class="seriesInfo">RFC 8899</span>, <span class="seriesInfo">DOI 10.17487/RFC8899</span>, <time datetime="2020-09" class="refDate">September 2020</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8899">https://www.rfc-editor.org/info/rfc8899</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+<div id="authors-addresses">
+<section id="appendix-A">
+      <h2 id="name-authors-addresses">
+<a href="#name-authors-addresses" class="section-name selfRef">Authors' Addresses</a>
+      </h2>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Antony Antony</span></div>
+<div dir="auto" class="left"><span class="org">secunet Security Networks AG</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:antony.antony@secunet.com" class="email">antony.antony@secunet.com</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Steffen Klassert</span></div>
+<div dir="auto" class="left"><span class="org">secunet Security Networks AG</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:steffen.klassert@secunet.com" class="email">steffen.klassert@secunet.com</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Lorenzo Colitti</span></div>
+<div dir="auto" class="left"><span class="org">Google</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:lorenzo@google.com" class="email">lorenzo@google.com</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Jen Linkova</span></div>
+<div dir="auto" class="left"><span class="org">Google</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:furry@google.com" class="email">furry@google.com</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Michael Richardson</span></div>
+<div dir="auto" class="left"><span class="org">Sandelman Software Works</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:mcr+ietf@sandelman.ca" class="email">mcr+ietf@sandelman.ca</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Nathan Harold</span></div>
+<div dir="auto" class="left"><span class="org">Google</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:nharold@google.com" class="email">nharold@google.com</a>
+</div>
+</address>
+</section>
+</div>
+<script>const toc = document.getElementById("toc");
+toc.querySelector("h2").addEventListener("click", e => {
+  toc.classList.toggle("active");
+});
+toc.querySelector("nav").addEventListener("click", e => {
+  toc.classList.remove("active");
+});
+</script>
+</body>
+</html>
