@@ -313,7 +313,7 @@ by optional Data:
 +-+-+-+-+-+-+-+-+-+-+-
 #+end_src
 
-- Sub-Type: ESP-ECHO-REQUEST or ESP-ECHO-REPLY
+- Sub-Type: ECHO-REQUEST or ECHO-REPLY
 - Reply path (R): 1-bit flag. Set to 1 to request an Echo Reply; set to 0
   when no reply is requested.
 - Reserved: 7 bits
@@ -358,7 +358,7 @@ When R=0, the responder MUST NOT reply, and any value in the Reply path
 SPI field MUST be ignored.
 
 When replying (R=1), the responder SHOULD copy the request message and
-MUST change the Sub-type to ESP-ECHO-REPLY; if the responder copies the
+MUST change the Sub-type to ECHO-REPLY; if the responder copies the
 request message, it MUST copy up to the reply path MTU.
 
 
@@ -468,8 +468,8 @@ This document defines two new registrations for the IANA ESP
 
       Value   ESP AGGFRAG_PAYLOAD Sub-Type       Reference
       -----   ------------------------------    ---------------
-      [TBD2]  ESP-ECHO-REQUEST                  [this document]
-      [TBD3]  ESP-ECHO-REPLY                    [this document]
+      [TBD2]  ECHO-REQUEST                  [this document]
+      [TBD3]  ECHO-REPLY                    [this document]
 
 #+end_src
 
