@@ -115,7 +115,7 @@
         <td class="lblock"><span class="delete">Expires: 5 November 2026
 </span></td>
         <td>&nbsp;</td>
-        <td class="rblock"><span class="insert">Expires: 23 April 2027                                        J. Linkova
+        <td class="rblock"><span class="insert">Expires: 24 April 2027                                        J. Linkova
 </span></td>
       </tr>
       <tr>
@@ -157,7 +157,7 @@
         <td>&nbsp;</td>
         <td class="lblock"></td>
         <td>&nbsp;</td>
-        <td class="rblock"><span class="insert">                                                         20 October 2026
+        <td class="rblock"><span class="insert">                                                         21 October 2026
 </span></td>
       </tr>
       <tr>
@@ -503,7 +503,7 @@
         <td class="lblock">   This Internet-Draft will expire on <span class="delete">5 Novembe</span>r 202<span class="delete">6</span>.
 </td>
         <td>&nbsp;</td>
-        <td class="rblock">   This Internet-Draft will expire on <span class="insert">23 Ap</span>r<span class="insert">il</span> 202<span class="insert">7</span>.
+        <td class="rblock">   This Internet-Draft will expire on <span class="insert">24 Ap</span>r<span class="insert">il</span> 202<span class="insert">7</span>.
 </td>
       </tr>
       <tr>
@@ -832,7 +832,7 @@
         <td class="lblock">   1<span class="delete">0</span>. Normative References  . . . . . . . . . . . . . . . . . . . .  <span class="delete"> 9</span>
 </td>
         <td>&nbsp;</td>
-        <td class="rblock">   1<span class="insert">1</span>. Normative References  . . . . . . . . . . . . . . . . . . . .  <span class="insert">12</span>
+        <td class="rblock">   1<span class="insert">1</span>. Normative References  . . . . . . . . . . . . . . . . . . . .  <span class="insert">13</span>
 </td>
       </tr>
       <tr>
@@ -840,7 +840,7 @@
         <td class="lblock">   1<span class="delete">1</span>. Informative References  . . . . . . . . . . . . . . . . . . .  1<span class="delete">0</span>
 </td>
         <td>&nbsp;</td>
-        <td class="rblock">   1<span class="insert">2</span>. Informative References  . . . . . . . . . . . . . . . . . . .  1<span class="insert">3</span>
+        <td class="rblock">   1<span class="insert">2</span>. Informative References  . . . . . . . . . . . . . . . . . . .  1<span class="insert">4</span>
 </td>
       </tr>
       <tr>
@@ -3047,10 +3047,10 @@
       </tr>
       <tr>
         <td>&nbsp;</td>
-        <td class="lblock">   *  Sub-Type: ESP-ECHO-REQUEST or ESP-ECHO-RE<span class="delete">S</span>P<span class="delete">ONSE</span>
+        <td class="lblock">   *  Sub-Type: <span class="delete">ESP-</span>ECHO-REQUEST or <span class="delete">ESP-</span>ECHO-RE<span class="delete">S</span>P<span class="delete">ONSE</span>
 </td>
         <td>&nbsp;</td>
-        <td class="rblock">   *  Sub-Type: ESP-ECHO-REQUEST or ESP-ECHO-REP<span class="insert">LY</span>
+        <td class="rblock">   *  Sub-Type: ECHO-REQUEST or ECHO-REP<span class="insert">LY</span>
 </td>
       </tr>
       <tr>
@@ -3335,7 +3335,7 @@
         <td class="lblock"><span class="delete">   does not match the initiator in the SPD, the responder MUST NOT
 </span></td>
         <td>&nbsp;</td>
-        <td class="rblock"><span class="insert">   SPI 7 has R=1 and the Reply path SPI is not 8, the responder SHOULD
+        <td class="rblock"><span class="insert">   SPI 7 has R=1 and the Reply path SPI is not 8, the responder MUST
 </span></td>
       </tr>
       <tr>
@@ -3343,7 +3343,7 @@
         <td class="lblock"><span class="delete">   respond via the requested SPI.  This is specifically to avoid
 </span></td>
         <td>&nbsp;</td>
-        <td class="rblock"><span class="insert">   treat this as a protocol error and SHOULD NOT reply.
+        <td class="rblock"><span class="insert">   treat this as a protocol error and MUST NOT reply.
 </span></td>
       </tr>
       <tr>
@@ -3355,10 +3355,88 @@
       </tr>
       <tr>
         <td>&nbsp;</td>
-        <td class="lblock"><span class="delete">   SPI of the SA on which the request was received.
-</span></td>
+        <td class="lblock"></td>
         <td>&nbsp;</td>
-        <td class="rblock"></td>
+        <td class="rblock"><span class="insert">   For encrypted requests, the Reply path SPI identifies the SA on which
+</span></td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="lblock"></td>
+        <td>&nbsp;</td>
+        <td class="rblock"><span class="insert">   the initiator expects to receive the Echo Reply.  The initiator MUST
+</span></td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="lblock"></td>
+        <td>&nbsp;</td>
+        <td class="rblock"><span class="insert">   set it to the SPI of an inbound SA that it has established with the
+</span></td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="lblock"></td>
+        <td>&nbsp;</td>
+        <td class="rblock"><span class="insert">   responder, that is, an SA whose SPI the initiator allocated and which
+</span></td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="lblock"></td>
+        <td>&nbsp;</td>
+        <td class="rblock"><span class="insert">   is present in its local SAD for that peer.  The responder MUST
+</span></td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="lblock"></td>
+        <td>&nbsp;</td>
+        <td class="rblock"><span class="insert">   validate the requested Reply path SPI against its own SAD: the SPI is
+</span></td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="lblock"></td>
+        <td>&nbsp;</td>
+        <td class="rblock"><span class="insert">   acceptable only if it identifies an established outbound SA from the
+</span></td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="lblock"></td>
+        <td>&nbsp;</td>
+        <td class="rblock"><span class="insert">   responder to the initiator.  If it does, the responder SHOULD send
+</span></td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="lblock"></td>
+        <td>&nbsp;</td>
+        <td class="rblock"><span class="insert">   the Echo Reply on that SA.  Otherwise the responder MUST NOT send the
+</span></td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="lblock"></td>
+        <td>&nbsp;</td>
+        <td class="rblock"><span class="insert">   reply on that SPI, to prevent amplification and reflection to
+</span></td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="lblock"></td>
+        <td>&nbsp;</td>
+        <td class="rblock"><span class="insert">   unrelated peers, though it MAY reply on the SA paired with the one on
+</span></td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="lblock">  <span class="delete"> SPI of the SA on</span> which the request was received.
+</td>
+        <td>&nbsp;</td>
+        <td class="rblock">   which the request was received.
+</td>
       </tr>
       <tr>
         <td>&nbsp;</td>
@@ -3367,68 +3445,6 @@
         <td>&nbsp;</td>
         <td class="right">
 </td>
-      </tr>
-      <tr>
-        <td>&nbsp;</td>
-        <td class="lblock"></td>
-        <td>&nbsp;</td>
-        <td class="rblock"><span class="insert">   For encrypted requests, the Reply path SPI MUST exist in the
-</span></td>
-      </tr>
-      <tr>
-        <td>&nbsp;</td>
-        <td class="lblock"></td>
-        <td>&nbsp;</td>
-        <td class="rblock"><span class="insert">   initiator&#x27;s local SADB for the target peer.  The responder SHOULD
-</span></td>
-      </tr>
-      <tr>
-        <td>&nbsp;</td>
-        <td class="lblock"></td>
-        <td>&nbsp;</td>
-        <td class="rblock"><span class="insert">   validate the requested Reply path SPI.  If the requested SPI matches
-</span></td>
-      </tr>
-      <tr>
-        <td>&nbsp;</td>
-        <td class="lblock"></td>
-        <td>&nbsp;</td>
-        <td class="rblock"><span class="insert">   an established SA with the peer, the responder SHOULD transmit the
-</span></td>
-      </tr>
-      <tr>
-        <td>&nbsp;</td>
-        <td class="lblock"></td>
-        <td>&nbsp;</td>
-        <td class="rblock"><span class="insert">   Echo Reply via that SA.  If the requested SPI does not match the peer
-</span></td>
-      </tr>
-      <tr>
-        <td>&nbsp;</td>
-        <td class="lblock"></td>
-        <td>&nbsp;</td>
-        <td class="rblock"><span class="insert">   in the SPD, the responder MUST NOT reply on that SPI to prevent
-</span></td>
-      </tr>
-      <tr>
-        <td>&nbsp;</td>
-        <td class="lblock"></td>
-        <td>&nbsp;</td>
-        <td class="rblock"><span class="insert">   amplification, though it MAY reply on the SA on which the request was
-</span></td>
-      </tr>
-      <tr>
-        <td>&nbsp;</td>
-        <td class="lblock"></td>
-        <td>&nbsp;</td>
-        <td class="rblock"><span class="insert">   received.
-</span></td>
-      </tr>
-      <tr>
-        <td>&nbsp;</td>
-        <td class="lblock"></td>
-        <td>&nbsp;</td>
-        <td class="rblock"></td>
       </tr>
       <tr>
         <td>&nbsp;</td>
@@ -3461,14 +3477,14 @@
         <td>&nbsp;</td>
         <td class="lblock"></td>
         <td>&nbsp;</td>
-        <td class="rblock"><span class="insert">   and MUST change the Sub-type to ESP-ECHO-REPLY; if the responder
+        <td class="rblock"><span class="insert">   and MUST change the Sub-type to ECHO-REPLY; if the responder copies
 </span></td>
       </tr>
       <tr>
         <td>&nbsp;</td>
         <td class="lblock"></td>
         <td>&nbsp;</td>
-        <td class="rblock"><span class="insert">   copies the request message, it MUST copy up to the reply path MTU.
+        <td class="rblock"><span class="insert">   the request message, it MUST copy up to the reply path MTU.
 </span></td>
       </tr>
       <tr>
@@ -3543,12 +3559,6 @@
         <td>&nbsp;</td>
         <td class="lblock"></td>
         <td>&nbsp;</td>
-        <td class="rblock"></td>
-      </tr>
-      <tr>
-        <td>&nbsp;</td>
-        <td class="lblock"></td>
-        <td>&nbsp;</td>
         <td class="rblock"><span class="insert">   *  The SPI field MUST be set to 7 (ESP-ECHO-REQUEST) for requests and
 </span></td>
       </tr>
@@ -3578,6 +3588,12 @@
         <td>&nbsp;</td>
         <td class="rblock"><span class="insert">      (AGGFRAG_PAYLOAD).
 </span></td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="lblock"></td>
+        <td>&nbsp;</td>
+        <td class="rblock"></td>
       </tr>
       <tr>
         <td>&nbsp;</td>
@@ -3905,6 +3921,12 @@
         <td>&nbsp;</td>
         <td class="rblock"><span class="insert">   probing.
 </span></td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="lblock"></td>
+        <td>&nbsp;</td>
+        <td class="rblock"></td>
       </tr>
       <tr>
         <td>&nbsp;</td>
@@ -4245,11 +4267,9 @@
       </tr>
       <tr>
         <td>&nbsp;</td>
-        <td class="left">
-</td>
+        <td class="lblock"></td>
         <td>&nbsp;</td>
-        <td class="right">
-</td>
+        <td class="rblock"></td>
       </tr>
       <tr>
         <td>&nbsp;</td>
@@ -4269,18 +4289,18 @@
       </tr>
       <tr>
         <td>&nbsp;</td>
-        <td class="left">   [TBD2]  ESP-ECHO-REQUEST                  [this document]
+        <td class="lblock">   [TBD2]  <span class="delete">ESP-</span>ECHO-REQUEST                  [this document]
 </td>
         <td>&nbsp;</td>
-        <td class="right">   [TBD2]  ESP-ECHO-REQUEST                  [this document]
+        <td class="rblock">   [TBD2]  ECHO-REQUEST                  [this document]
 </td>
       </tr>
       <tr>
         <td>&nbsp;</td>
-        <td class="lblock">   [TBD3]  ESP-ECHO-RE<span class="delete">S</span>P<span class="delete">ONSE</span>                 [this document]
+        <td class="lblock">   [TBD3]  <span class="delete">ESP-</span>ECHO-RE<span class="delete">S</span>P<span class="delete">ONSE</span>                 [this document]
 </td>
         <td>&nbsp;</td>
-        <td class="rblock">   [TBD3]  ESP-ECHO-REP<span class="insert">LY   </span>                 [this document]
+        <td class="rblock">   [TBD3]  ECHO-REP<span class="insert">LY   </span>                 [this document]
 </td>
       </tr>
       <tr>
@@ -4309,9 +4329,11 @@
       </tr>
       <tr>
         <td>&nbsp;</td>
-        <td class="lblock"></td>
+        <td class="left">
+</td>
         <td>&nbsp;</td>
-        <td class="rblock"></td>
+        <td class="right">
+</td>
       </tr>
       <tr>
         <td>&nbsp;</td>
@@ -4620,12 +4642,6 @@
       </tr>
       <tr>
         <td>&nbsp;</td>
-        <td class="lblock"></td>
-        <td>&nbsp;</td>
-        <td class="rblock"></td>
-      </tr>
-      <tr>
-        <td>&nbsp;</td>
         <td class="lblock">1<span class="delete">0</span>.  Normative References
 </td>
         <td>&nbsp;</td>
@@ -4663,6 +4679,12 @@
         <td>&nbsp;</td>
         <td class="right">              aggfrag-payload.xhtml&gt;.
 </td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="lblock"></td>
+        <td>&nbsp;</td>
+        <td class="rblock"></td>
       </tr>
       <tr>
         <td>&nbsp;</td>
@@ -4928,23 +4950,35 @@
       </tr>
       <tr>
         <td>&nbsp;</td>
-        <td class="left">&nbsp;</td>
+        <td class="left">
+</td>
         <td>&nbsp;</td>
-        <td class="right">&nbsp;</td>
+        <td class="right">
+</td>
       </tr>
-      <tr id="context-0">
-        <td></td>
-        <th class="change" scope="col">
-          <a href="#context-0">
-           <small>Skipping</small>
-          </a>
-        </th>
-        <td></td>
-        <th class="change" scope="col">
-          <a href="#context-0">
-           <small>Skipping</small>
-          </a>
-        </th>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">   [RFC9347]  Hopps, C., &quot;Aggregation and Fragmentation Mode for
+</td>
+        <td>&nbsp;</td>
+        <td class="right">   [RFC9347]  Hopps, C., &quot;Aggregation and Fragmentation Mode for
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">              Encapsulating Security Payload (ESP) and Its Use for IP
+</td>
+        <td>&nbsp;</td>
+        <td class="right">              Encapsulating Security Payload (ESP) and Its Use for IP
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">              Traffic Flow Security (IP-TFS)&quot;, RFC 9347,
+</td>
+        <td>&nbsp;</td>
+        <td class="right">              Traffic Flow Security (IP-TFS)&quot;, RFC 9347,
+</td>
       </tr>
       <tr>
         <td>&nbsp;</td>
@@ -4964,11 +4998,9 @@
       </tr>
       <tr>
         <td>&nbsp;</td>
-        <td class="left">
-</td>
+        <td class="lblock"></td>
         <td>&nbsp;</td>
-        <td class="right">
-</td>
+        <td class="rblock"></td>
       </tr>
       <tr>
         <td>&nbsp;</td>
@@ -5020,17 +5052,18 @@
       </tr>
       <tr>
         <td>&nbsp;</td>
-        <td class="lblock"></td>
+        <td class="left">
+</td>
         <td>&nbsp;</td>
-        <td class="rblock"><span class="insert">   [I-D.ietf-ipsecme-ikev2-reliable-transport]
-</span></td>
+        <td class="right">
+</td>
       </tr>
       <tr>
         <td>&nbsp;</td>
         <td class="lblock"><span class="delete">   [I-D.ietf-ipsecme-esp-ping]
 </span></td>
         <td>&nbsp;</td>
-        <td class="rblock"><span class="insert">              Smyslov, V. and T. Reddy.K, &quot;Separate Transports for IKE
+        <td class="rblock"><span class="insert">   [I-D.ietf-ipsecme-ikev2-reliable-transport]
 </span></td>
       </tr>
       <tr>
@@ -5038,7 +5071,8 @@
         <td class="lblock"><span class="delete">              Colitti, L., Linkova, J., and M. Richardson, &quot;ESP Echo
 </span></td>
         <td>&nbsp;</td>
-        <td class="rblock"></td>
+        <td class="rblock"><span class="insert">              Smyslov, V. and T. Reddy.K, &quot;Separate Transports for IKE
+</span></td>
       </tr>
       <tr>
         <td>&nbsp;</td>
@@ -5375,19 +5409,15 @@
       </tr>
       <tr>
         <td>&nbsp;</td>
-        <td class="left">
-</td>
+        <td class="lblock"></td>
         <td>&nbsp;</td>
-        <td class="right">
-</td>
+        <td class="rblock"></td>
       </tr>
       <tr>
         <td>&nbsp;</td>
-        <td class="left">
-</td>
+        <td class="lblock"></td>
         <td>&nbsp;</td>
-        <td class="right">
-</td>
+        <td class="rblock"></td>
       </tr>
       <tr>
         <td>&nbsp;</td>
@@ -5412,6 +5442,18 @@
         <td>&nbsp;</td>
         <td class="right">   Email: steffen.klassert@secunet.com
 </td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="lblock"></td>
+        <td>&nbsp;</td>
+        <td class="rblock"></td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="lblock"></td>
+        <td>&nbsp;</td>
+        <td class="rblock"></td>
       </tr>
       <tr>
         <td>&nbsp;</td>

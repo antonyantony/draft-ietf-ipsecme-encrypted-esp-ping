@@ -6,13 +6,13 @@ IP Security Maintenance and Extensions                         A. Antony
 Internet-Draft                                               S. Klassert
 Updates: 4303, 9347 (if approved)                                secunet
 Intended status: Standards Track                              L. Colitti
-Expires: 23 April 2027                                        J. Linkova
+Expires: 24 April 2027                                        J. Linkova
                                                                   Google
                                                            M. Richardson
                                                                Sandelman
                                                                N. Harold
                                                                   Google
-                                                         20 October 2026
+                                                         21 October 2026
 
 
                            ESP Echo Protocol
@@ -53,7 +53,7 @@ Status of This Memo
 
 
 
-Antony, et al.            Expires 23 April 2027                 [Page 1]
+Antony, et al.            Expires 24 April 2027                 [Page 1]
 
 Internet-Draft                  ESP Ping                    October 2026
 
@@ -63,7 +63,7 @@ Internet-Draft                  ESP Ping                    October 2026
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 23 April 2027.
+   This Internet-Draft will expire on 24 April 2027.
 
 Copyright Notice
 
@@ -105,16 +105,16 @@ Table of Contents
    8.  Operational Considerations  . . . . . . . . . . . . . . . . .  12
    9.  Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .  12
    10. Security Considerations . . . . . . . . . . . . . . . . . . .  12
-   11. Normative References  . . . . . . . . . . . . . . . . . . . .  12
+   11. Normative References  . . . . . . . . . . . . . . . . . . . .  13
 
 
 
-Antony, et al.            Expires 23 April 2027                 [Page 2]
+Antony, et al.            Expires 24 April 2027                 [Page 2]
 
 Internet-Draft                  ESP Ping                    October 2026
 
 
-   12. Informative References  . . . . . . . . . . . . . . . . . . .  13
+   12. Informative References  . . . . . . . . . . . . . . . . . . .  14
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  14
 
 1.  Introduction
@@ -165,7 +165,7 @@ Internet-Draft                  ESP Ping                    October 2026
 
 
 
-Antony, et al.            Expires 23 April 2027                 [Page 3]
+Antony, et al.            Expires 24 April 2027                 [Page 3]
 
 Internet-Draft                  ESP Ping                    October 2026
 
@@ -221,7 +221,7 @@ Internet-Draft                  ESP Ping                    October 2026
 
 
 
-Antony, et al.            Expires 23 April 2027                 [Page 4]
+Antony, et al.            Expires 24 April 2027                 [Page 4]
 
 Internet-Draft                  ESP Ping                    October 2026
 
@@ -277,7 +277,7 @@ Internet-Draft                  ESP Ping                    October 2026
 
 
 
-Antony, et al.            Expires 23 April 2027                 [Page 5]
+Antony, et al.            Expires 24 April 2027                 [Page 5]
 
 Internet-Draft                  ESP Ping                    October 2026
 
@@ -333,7 +333,7 @@ Internet-Draft                  ESP Ping                    October 2026
 
 
 
-Antony, et al.            Expires 23 April 2027                 [Page 6]
+Antony, et al.            Expires 24 April 2027                 [Page 6]
 
 Internet-Draft                  ESP Ping                    October 2026
 
@@ -389,7 +389,7 @@ Internet-Draft                  ESP Ping                    October 2026
 
 
 
-Antony, et al.            Expires 23 April 2027                 [Page 7]
+Antony, et al.            Expires 24 April 2027                 [Page 7]
 
 Internet-Draft                  ESP Ping                    October 2026
 
@@ -422,7 +422,7 @@ Internet-Draft                  ESP Ping                    October 2026
 
                      Figure 1: ESP Echo Payload Format
 
-   *  Sub-Type: ESP-ECHO-REQUEST or ESP-ECHO-REPLY
+   *  Sub-Type: ECHO-REQUEST or ECHO-REPLY
 
    *  Reply path (R): 1-bit flag.  Set to 1 to request an Echo Reply;
       set to 0 when no reply is requested.
@@ -445,7 +445,7 @@ Internet-Draft                  ESP Ping                    October 2026
 
 
 
-Antony, et al.            Expires 23 April 2027                 [Page 8]
+Antony, et al.            Expires 24 April 2027                 [Page 8]
 
 Internet-Draft                  ESP Ping                    October 2026
 
@@ -464,24 +464,28 @@ Internet-Draft                  ESP Ping                    October 2026
    When R=1, the Reply path SPI field MUST specify the target SPI for
    the reply.  For unencrypted requests (outer SPI 7), the Reply path
    SPI MUST be set to 8 (ESP-ECHO-REPLY).  If an unencrypted request on
-   SPI 7 has R=1 and the Reply path SPI is not 8, the responder SHOULD
-   treat this as a protocol error and SHOULD NOT reply.
+   SPI 7 has R=1 and the Reply path SPI is not 8, the responder MUST
+   treat this as a protocol error and MUST NOT reply.
 
-   For encrypted requests, the Reply path SPI MUST exist in the
-   initiator's local SADB for the target peer.  The responder SHOULD
-   validate the requested Reply path SPI.  If the requested SPI matches
-   an established SA with the peer, the responder SHOULD transmit the
-   Echo Reply via that SA.  If the requested SPI does not match the peer
-   in the SPD, the responder MUST NOT reply on that SPI to prevent
-   amplification, though it MAY reply on the SA on which the request was
-   received.
+   For encrypted requests, the Reply path SPI identifies the SA on which
+   the initiator expects to receive the Echo Reply.  The initiator MUST
+   set it to the SPI of an inbound SA that it has established with the
+   responder, that is, an SA whose SPI the initiator allocated and which
+   is present in its local SAD for that peer.  The responder MUST
+   validate the requested Reply path SPI against its own SAD: the SPI is
+   acceptable only if it identifies an established outbound SA from the
+   responder to the initiator.  If it does, the responder SHOULD send
+   the Echo Reply on that SA.  Otherwise the responder MUST NOT send the
+   reply on that SPI, to prevent amplification and reflection to
+   unrelated peers, though it MAY reply on the SA paired with the one on
+   which the request was received.
 
    When R=0, the responder MUST NOT reply, and any value in the Reply
    path SPI field MUST be ignored.
 
    When replying (R=1), the responder SHOULD copy the request message
-   and MUST change the Sub-type to ESP-ECHO-REPLY; if the responder
-   copies the request message, it MUST copy up to the reply path MTU.
+   and MUST change the Sub-type to ECHO-REPLY; if the responder copies
+   the request message, it MUST copy up to the reply path MTU.
 
 5.5.  Unencrypted Mode (Fixed SPI 7 and 8)
 
@@ -493,18 +497,20 @@ Internet-Draft                  ESP Ping                    October 2026
    algorithm [RFC2410] and no integrity protection (AUTH_NONE
    [RFC7296]):
 
+
+
+
+
+Antony, et al.            Expires 24 April 2027                 [Page 9]
+
+Internet-Draft                  ESP Ping                    October 2026
+
+
    *  The SPI field MUST be set to 7 (ESP-ECHO-REQUEST) for requests and
       8 (ESP-ECHO-REPLY) for replies.
 
    *  The Next Header field in the ESP trailer MUST be set to 144
       (AGGFRAG_PAYLOAD).
-
-
-
-Antony, et al.            Expires 23 April 2027                 [Page 9]
-
-Internet-Draft                  ESP Ping                    October 2026
-
 
    *  Under NULL encryption [RFC2410] and no integrity protection
       ([RFC4303] Section 2.7), the Initialization Vector (IV) and
@@ -548,19 +554,20 @@ Internet-Draft                  ESP Ping                    October 2026
    Because unencrypted ESP Echo packets operate outside the context of a
    negotiated ESP SA, receivers MUST NOT require a dynamically
    negotiated Security Association to accept and process incoming
+
+
+
+Antony, et al.            Expires 24 April 2027                [Page 10]
+
+Internet-Draft                  ESP Ping                    October 2026
+
+
    packets with SPI values 7 and 8 (arriving over raw ESP protocol 50 or
    UDP/TCP encapsulation).  Implementations MAY process these packets
    directly or MAY utilize static SADB entries configured with NULL
    encryption ([RFC2410]) and no authentication to maintain
    administrative, policy, or rate-limiting information for unencrypted
    probing.
-
-
-
-Antony, et al.            Expires 23 April 2027                [Page 10]
-
-Internet-Draft                  ESP Ping                    October 2026
-
 
 5.6.  Behavior under UDP and TCP Encapsulation
 
@@ -603,20 +610,21 @@ Internet-Draft                  ESP Ping                    October 2026
    This document defines two new registrations for the IANA ESP
    [AGGFRAG] PAYLOAD Sub-Types.
 
-   Value   ESP AGGFRAG_PAYLOAD Sub-Type       Reference
-   -----   ------------------------------    ---------------
-   [TBD2]  ESP-ECHO-REQUEST                  [this document]
-   [TBD3]  ESP-ECHO-REPLY                    [this document]
-
-   This document defines one new registration for the IANA "IKEv2 Notify
-   Message Status Types" [STATUSNOTIFY].
 
 
 
-Antony, et al.            Expires 23 April 2027                [Page 11]
+Antony, et al.            Expires 24 April 2027                [Page 11]
 
 Internet-Draft                  ESP Ping                    October 2026
 
+
+   Value   ESP AGGFRAG_PAYLOAD Sub-Type       Reference
+   -----   ------------------------------    ---------------
+   [TBD2]  ECHO-REQUEST                  [this document]
+   [TBD3]  ECHO-REPLY                    [this document]
+
+   This document defines one new registration for the IANA "IKEv2 Notify
+   Message Status Types" [STATUSNOTIFY].
 
    Value     Notify Message Status Type      Reference
    -------  ----------------------------    ---------------
@@ -658,21 +666,19 @@ Internet-Draft                  ESP Ping                    October 2026
    7 or 8; however, within an established ESP SA, Encrypted Mode
    cryptographically authenticates all echo requests and replies.
 
+
+
+
+Antony, et al.            Expires 24 April 2027                [Page 12]
+
+Internet-Draft                  ESP Ping                    October 2026
+
+
 11.  Normative References
 
    [AGGFRAG]  IANA, "ESP AGGFRAG_PAYLOAD Registry",
               <https://www.iana.org/assignments/esp-aggfrag-payload/esp-
               aggfrag-payload.xhtml>.
-
-
-
-
-
-
-Antony, et al.            Expires 23 April 2027                [Page 12]
-
-Internet-Draft                  ESP Ping                    October 2026
-
 
    [RFC0792]  Postel, J., "Internet Control Message Protocol", STD 5,
               RFC 792, DOI 10.17487/RFC792, September 1981,
@@ -715,20 +721,21 @@ Internet-Draft                  ESP Ping                    October 2026
               DOI 10.17487/RFC9347, January 2023,
               <https://www.rfc-editor.org/info/rfc9347>.
 
+
+
+
+
+Antony, et al.            Expires 24 April 2027                [Page 13]
+
+Internet-Draft                  ESP Ping                    October 2026
+
+
    [STATUSNOTIFY]
               IANA, "IKEv2 Notify Message Status Types",
               <https://www.iana.org/assignments/ikev2-parameters/
               ikev2-parameters.xhtml#ikev2-parameters-16>.
 
 12.  Informative References
-
-
-
-
-Antony, et al.            Expires 23 April 2027                [Page 13]
-
-Internet-Draft                  ESP Ping                    October 2026
-
 
    [I-D.ietf-ipsecme-ikev2-reliable-transport]
               Smyslov, V. and T. Reddy.K, "Separate Transports for IKE
@@ -773,17 +780,15 @@ Authors' Addresses
    Email: antony.antony@secunet.com
 
 
+
+Antony, et al.            Expires 24 April 2027                [Page 14]
+
+Internet-Draft                  ESP Ping                    October 2026
+
+
    Steffen Klassert
    secunet Security Networks AG
    Email: steffen.klassert@secunet.com
-
-
-
-
-
-Antony, et al.            Expires 23 April 2027                [Page 14]
-
-Internet-Draft                  ESP Ping                    October 2026
 
 
    Lorenzo Colitti
@@ -832,9 +837,4 @@ Internet-Draft                  ESP Ping                    October 2026
 
 
 
-
-
-
-
-
-Antony, et al.            Expires 23 April 2027                [Page 15]
+Antony, et al.            Expires 24 April 2027                [Page 15]
