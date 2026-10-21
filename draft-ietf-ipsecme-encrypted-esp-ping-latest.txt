@@ -16,7 +16,7 @@ Expires: 24 April 2027                                        J. Linkova
 
 
                            ESP Echo Protocol
-                draft-ietf-ipsecme-encrypted-esp-ping-04
+                draft-ietf-ipsecme-encrypted-esp-ping-05
 
 Abstract
 
