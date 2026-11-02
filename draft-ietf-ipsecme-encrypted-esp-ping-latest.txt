@@ -13,7 +13,7 @@ Expires: 6 May 2027                                           J. Linkova
 
 
                            ESP Echo Protocol
-                draft-ietf-ipsecme-encrypted-esp-ping-06
+                draft-ietf-ipsecme-encrypted-esp-ping-05
 
 Abstract
 
@@ -737,7 +737,16 @@ Internet-Draft                  ESP Ping                   November 2026
    Name  ESP Ping IP-TFS (https://github.com/antonyantony/linux/tree/
       esp-ping-iptfs)
 
-   Description  An initial Kernel ESP Ping
+   Description  An initial implementation of the ESP Echo Protocol in
+      the Linux kernel (net/ipv4/esp_ping.c), both encrypted and
+      unencrypted.  It adds an IPPROTO_AGGFRAG ping socket type for IPv4
+      and IPv6, with a socket option to select the outbound SPI.  It
+      sends and receives encrypted ESP Echo Request and Reply packets
+      carried in AGGFRAG_PAYLOAD inside an SA, and answers requests with
+      Echo Replies.  Unencrypted echo using SPI values 7 and 8 is
+      implemented, and echo packets bypass the SPD.  IKEv2 negotiation
+      of ESP_ECHO_SUPPORTED is implemented in strongSwan.  And uses
+      busybox ping for testing.
 
    Level of maturity  Alpha
 
@@ -767,15 +776,6 @@ Internet-Draft                  ESP Ping                   November 2026
               Address Spoofing", BCP 38, RFC 2827, DOI 10.17487/RFC2827,
               May 2000, <https://www.rfc-editor.org/info/rfc2827>.
 
-   [RFC4301]  Kent, S. and K. Seo, "Security Architecture for the
-              Internet Protocol", RFC 4301, DOI 10.17487/RFC4301,
-              December 2005, <https://www.rfc-editor.org/info/rfc4301>.
-
-   [RFC4303]  Kent, S., "IP Encapsulating Security Payload (ESP)",
-              RFC 4303, DOI 10.17487/RFC4303, December 2005,
-              <https://www.rfc-editor.org/info/rfc4303>.
-
-
 
 
 
@@ -785,6 +785,14 @@ Antony, et al.             Expires 6 May 2027                  [Page 14]
 
 Internet-Draft                  ESP Ping                   November 2026
 
+
+   [RFC4301]  Kent, S. and K. Seo, "Security Architecture for the
+              Internet Protocol", RFC 4301, DOI 10.17487/RFC4301,
+              December 2005, <https://www.rfc-editor.org/info/rfc4301>.
+
+   [RFC4303]  Kent, S., "IP Encapsulating Security Payload (ESP)",
+              RFC 4303, DOI 10.17487/RFC4303, December 2005,
+              <https://www.rfc-editor.org/info/rfc4303>.
 
    [RFC7296]  Kaufman, C., Hoffman, P., Nir, Y., Eronen, P., and T.
               Kivinen, "Internet Key Exchange Protocol Version 2
@@ -824,14 +832,6 @@ Internet-Draft                  ESP Ping                   November 2026
               (MOBIKE)", RFC 4555, DOI 10.17487/RFC4555, June 2006,
               <https://www.rfc-editor.org/info/rfc4555>.
 
-   [RFC4787]  Audet, F., Ed. and C. Jennings, "Network Address
-              Translation (NAT) Behavioral Requirements for Unicast
-              UDP", BCP 127, RFC 4787, DOI 10.17487/RFC4787, January
-              2007, <https://www.rfc-editor.org/info/rfc4787>.
-
-   [RFC4821]  Mathis, M. and J. Heffner, "Packetization Layer Path MTU
-              Discovery", RFC 4821, DOI 10.17487/RFC4821, March 2007,
-              <https://www.rfc-editor.org/info/rfc4821>.
 
 
 
@@ -841,6 +841,15 @@ Antony, et al.             Expires 6 May 2027                  [Page 15]
 
 Internet-Draft                  ESP Ping                   November 2026
 
+
+   [RFC4787]  Audet, F., Ed. and C. Jennings, "Network Address
+              Translation (NAT) Behavioral Requirements for Unicast
+              UDP", BCP 127, RFC 4787, DOI 10.17487/RFC4787, January
+              2007, <https://www.rfc-editor.org/info/rfc4787>.
+
+   [RFC4821]  Mathis, M. and J. Heffner, "Packetization Layer Path MTU
+              Discovery", RFC 4821, DOI 10.17487/RFC4821, March 2007,
+              <https://www.rfc-editor.org/info/rfc4821>.
 
    [RFC6092]  Woodyatt, J., Ed., "Recommended Simple Security
               Capabilities in Customer Premises Equipment (CPE) for
@@ -881,15 +890,6 @@ Authors' Addresses
 
    Lorenzo Colitti
    Google
-   Email: lorenzo@google.com
-
-
-   Jen Linkova
-   Google
-   Email: furry@google.com
-
-
-
 
 
 
@@ -898,17 +898,17 @@ Antony, et al.             Expires 6 May 2027                  [Page 16]
 Internet-Draft                  ESP Ping                   November 2026
 
 
+   Email: lorenzo@google.com
+
+
+   Jen Linkova
+   Google
+   Email: furry@google.com
+
+
    Nathan Harold
    Google
    Email: nharold@google.com
-
-
-
-
-
-
-
-
 
 
 

@@ -3,7 +3,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Diff: draft-ietf-ipsecme-encrypted-esp-ping-04-published.txt - draft-ietf-ipsecme-encrypted-esp-ping-06.txt</title>
+    <title>Diff: draft-ietf-ipsecme-encrypted-esp-ping-04-published.txt - draft-ietf-ipsecme-encrypted-esp-ping-05.txt</title>
     <style>
       body {font-family: monospace}
       table {
@@ -44,7 +44,7 @@
           <td>&nbsp;</td>
           <th class="header" scope="col">draft-ietf-ipsecme-encrypted-esp-ping-04-published.txt</th>
           <td>&nbsp;</td>
-          <th class="header" scope="col">draft-ietf-ipsecme-encrypted-esp-ping-06.txt</th>
+          <th class="header" scope="col">draft-ietf-ipsecme-encrypted-esp-ping-05.txt</th>
         </tr>
       <tr>
         <td>&nbsp;</td>
@@ -192,7 +192,7 @@
         <td class="lblock">                draft-ietf-ipsecme-encrypted-esp-ping-0<span class="delete">4</span>
 </td>
         <td>&nbsp;</td>
-        <td class="rblock">                draft-ietf-ipsecme-encrypted-esp-ping-0<span class="insert">6</span>
+        <td class="rblock">                draft-ietf-ipsecme-encrypted-esp-ping-0<span class="insert">5</span>
 </td>
       </tr>
       <tr>
@@ -1078,7 +1078,70 @@
         <td>&nbsp;</td>
         <td class="lblock"></td>
         <td>&nbsp;</td>
-        <td class="rblock"><span class="insert">   Description  An initial Kernel ESP Ping
+        <td class="rblock"><span class="insert">   Description  An initial implementation of the ESP Echo Protocol in
+</span></td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="lblock"></td>
+        <td>&nbsp;</td>
+        <td class="rblock"><span class="insert">      the Linux kernel (net/ipv4/esp_ping.c), both encrypted and
+</span></td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="lblock"></td>
+        <td>&nbsp;</td>
+        <td class="rblock"><span class="insert">      unencrypted.  It adds an IPPROTO_AGGFRAG ping socket type for IPv4
+</span></td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="lblock"></td>
+        <td>&nbsp;</td>
+        <td class="rblock"><span class="insert">      and IPv6, with a socket option to select the outbound SPI.  It
+</span></td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="lblock"></td>
+        <td>&nbsp;</td>
+        <td class="rblock"><span class="insert">      sends and receives encrypted ESP Echo Request and Reply packets
+</span></td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="lblock"></td>
+        <td>&nbsp;</td>
+        <td class="rblock"><span class="insert">      carried in AGGFRAG_PAYLOAD inside an SA, and answers requests with
+</span></td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="lblock"></td>
+        <td>&nbsp;</td>
+        <td class="rblock"><span class="insert">      Echo Replies.  Unencrypted echo using SPI values 7 and 8 is
+</span></td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="lblock"></td>
+        <td>&nbsp;</td>
+        <td class="rblock"><span class="insert">      implemented, and echo packets bypass the SPD.  IKEv2 negotiation
+</span></td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="lblock"></td>
+        <td>&nbsp;</td>
+        <td class="rblock"><span class="insert">      of ESP_ECHO_SUPPORTED is implemented in strongSwan.  And uses
+</span></td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="lblock"></td>
+        <td>&nbsp;</td>
+        <td class="rblock"><span class="insert">      busybox ping for testing.
 </span></td>
       </tr>
       <tr>
@@ -1200,6 +1263,222 @@
         <td></td>
         <th class="change" scope="col">
           <a href="#context-3">
+           <small>Skipping</small>
+          </a>
+        </th>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">   [RFC2410]  Glenn, R. and S. Kent, &quot;The NULL Encryption Algorithm and
+</td>
+        <td>&nbsp;</td>
+        <td class="right">   [RFC2410]  Glenn, R. and S. Kent, &quot;The NULL Encryption Algorithm and
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">              Its Use With IPsec&quot;, RFC 2410, DOI 10.17487/RFC2410,
+</td>
+        <td>&nbsp;</td>
+        <td class="right">              Its Use With IPsec&quot;, RFC 2410, DOI 10.17487/RFC2410,
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">              November 1998, &lt;https://www.rfc-editor.org/info/rfc2410&gt;.
+</td>
+        <td>&nbsp;</td>
+        <td class="right">              November 1998, &lt;https://www.rfc-editor.org/info/rfc2410&gt;.
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">
+</td>
+        <td>&nbsp;</td>
+        <td class="right">
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">   [RFC2827]  Ferguson, P. and D. Senie, &quot;Network Ingress Filtering:
+</td>
+        <td>&nbsp;</td>
+        <td class="right">   [RFC2827]  Ferguson, P. and D. Senie, &quot;Network Ingress Filtering:
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">              Defeating Denial of Service Attacks which employ IP Source
+</td>
+        <td>&nbsp;</td>
+        <td class="right">              Defeating Denial of Service Attacks which employ IP Source
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">              Address Spoofing&quot;, BCP 38, RFC 2827, DOI 10.17487/RFC2827,
+</td>
+        <td>&nbsp;</td>
+        <td class="right">              Address Spoofing&quot;, BCP 38, RFC 2827, DOI 10.17487/RFC2827,
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">              May 2000, &lt;https://www.rfc-editor.org/info/rfc2827&gt;.
+</td>
+        <td>&nbsp;</td>
+        <td class="right">              May 2000, &lt;https://www.rfc-editor.org/info/rfc2827&gt;.
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="lblock"></td>
+        <td>&nbsp;</td>
+        <td class="rblock"></td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">   [RFC4301]  Kent, S. and K. Seo, &quot;Security Architecture for the
+</td>
+        <td>&nbsp;</td>
+        <td class="right">   [RFC4301]  Kent, S. and K. Seo, &quot;Security Architecture for the
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">              Internet Protocol&quot;, RFC 4301, DOI 10.17487/RFC4301,
+</td>
+        <td>&nbsp;</td>
+        <td class="right">              Internet Protocol&quot;, RFC 4301, DOI 10.17487/RFC4301,
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">              December 2005, &lt;https://www.rfc-editor.org/info/rfc4301&gt;.
+</td>
+        <td>&nbsp;</td>
+        <td class="right">              December 2005, &lt;https://www.rfc-editor.org/info/rfc4301&gt;.
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">
+</td>
+        <td>&nbsp;</td>
+        <td class="right">
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">   [RFC4303]  Kent, S., &quot;IP Encapsulating Security Payload (ESP)&quot;,
+</td>
+        <td>&nbsp;</td>
+        <td class="right">   [RFC4303]  Kent, S., &quot;IP Encapsulating Security Payload (ESP)&quot;,
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">              RFC 4303, DOI 10.17487/RFC4303, December 2005,
+</td>
+        <td>&nbsp;</td>
+        <td class="right">              RFC 4303, DOI 10.17487/RFC4303, December 2005,
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">              &lt;https://www.rfc-editor.org/info/rfc4303&gt;.
+</td>
+        <td>&nbsp;</td>
+        <td class="right">              &lt;https://www.rfc-editor.org/info/rfc4303&gt;.
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="lblock"></td>
+        <td>&nbsp;</td>
+        <td class="rblock"></td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">   [RFC7296]  Kaufman, C., Hoffman, P., Nir, Y., Eronen, P., and T.
+</td>
+        <td>&nbsp;</td>
+        <td class="right">   [RFC7296]  Kaufman, C., Hoffman, P., Nir, Y., Eronen, P., and T.
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">              Kivinen, &quot;Internet Key Exchange Protocol Version 2
+</td>
+        <td>&nbsp;</td>
+        <td class="right">              Kivinen, &quot;Internet Key Exchange Protocol Version 2
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">              (IKEv2)&quot;, STD 79, RFC 7296, DOI 10.17487/RFC7296, October
+</td>
+        <td>&nbsp;</td>
+        <td class="right">              (IKEv2)&quot;, STD 79, RFC 7296, DOI 10.17487/RFC7296, October
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">              2014, &lt;https://www.rfc-editor.org/info/rfc7296&gt;.
+</td>
+        <td>&nbsp;</td>
+        <td class="right">              2014, &lt;https://www.rfc-editor.org/info/rfc7296&gt;.
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">
+</td>
+        <td>&nbsp;</td>
+        <td class="right">
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">   [RFC8174]  Leiba, B., &quot;Ambiguity of Uppercase vs Lowercase in RFC
+</td>
+        <td>&nbsp;</td>
+        <td class="right">   [RFC8174]  Leiba, B., &quot;Ambiguity of Uppercase vs Lowercase in RFC
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">              2119 Key Words&quot;, BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+</td>
+        <td>&nbsp;</td>
+        <td class="right">              2119 Key Words&quot;, BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">              May 2017, &lt;https://www.rfc-editor.org/info/rfc8174&gt;.
+</td>
+        <td>&nbsp;</td>
+        <td class="right">              May 2017, &lt;https://www.rfc-editor.org/info/rfc8174&gt;.
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="right">&nbsp;</td>
+      </tr>
+      <tr id="context-4">
+        <td></td>
+        <th class="change" scope="col">
+          <a href="#context-4">
+           <small>Skipping</small>
+          </a>
+        </th>
+        <td></td>
+        <th class="change" scope="col">
+          <a href="#context-4">
            <small>Skipping</small>
           </a>
         </th>
@@ -1398,23 +1677,111 @@
       </tr>
       <tr>
         <td>&nbsp;</td>
-        <td class="left">&nbsp;</td>
+        <td class="left">              &lt;https://www.rfc-editor.org/info/rfc4555&gt;.
+</td>
         <td>&nbsp;</td>
-        <td class="right">&nbsp;</td>
+        <td class="right">              &lt;https://www.rfc-editor.org/info/rfc4555&gt;.
+</td>
       </tr>
-      <tr id="context-4">
-        <td></td>
-        <th class="change" scope="col">
-          <a href="#context-4">
-           <small>Skipping</small>
-          </a>
-        </th>
-        <td></td>
-        <th class="change" scope="col">
-          <a href="#context-4">
-           <small>Skipping</small>
-          </a>
-        </th>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="lblock"></td>
+        <td>&nbsp;</td>
+        <td class="rblock"></td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">   [RFC4787]  Audet, F., Ed. and C. Jennings, &quot;Network Address
+</td>
+        <td>&nbsp;</td>
+        <td class="right">   [RFC4787]  Audet, F., Ed. and C. Jennings, &quot;Network Address
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">              Translation (NAT) Behavioral Requirements for Unicast
+</td>
+        <td>&nbsp;</td>
+        <td class="right">              Translation (NAT) Behavioral Requirements for Unicast
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">              UDP&quot;, BCP 127, RFC 4787, DOI 10.17487/RFC4787, January
+</td>
+        <td>&nbsp;</td>
+        <td class="right">              UDP&quot;, BCP 127, RFC 4787, DOI 10.17487/RFC4787, January
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">              2007, &lt;https://www.rfc-editor.org/info/rfc4787&gt;.
+</td>
+        <td>&nbsp;</td>
+        <td class="right">              2007, &lt;https://www.rfc-editor.org/info/rfc4787&gt;.
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">
+</td>
+        <td>&nbsp;</td>
+        <td class="right">
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">   [RFC4821]  Mathis, M. and J. Heffner, &quot;Packetization Layer Path MTU
+</td>
+        <td>&nbsp;</td>
+        <td class="right">   [RFC4821]  Mathis, M. and J. Heffner, &quot;Packetization Layer Path MTU
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">              Discovery&quot;, RFC 4821, DOI 10.17487/RFC4821, March 2007,
+</td>
+        <td>&nbsp;</td>
+        <td class="right">              Discovery&quot;, RFC 4821, DOI 10.17487/RFC4821, March 2007,
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">              &lt;https://www.rfc-editor.org/info/rfc4821&gt;.
+</td>
+        <td>&nbsp;</td>
+        <td class="right">              &lt;https://www.rfc-editor.org/info/rfc4821&gt;.
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="lblock"></td>
+        <td>&nbsp;</td>
+        <td class="rblock"></td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">   [RFC6092]  Woodyatt, J., Ed., &quot;Recommended Simple Security
+</td>
+        <td>&nbsp;</td>
+        <td class="right">   [RFC6092]  Woodyatt, J., Ed., &quot;Recommended Simple Security
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">              Capabilities in Customer Premises Equipment (CPE) for
+</td>
+        <td>&nbsp;</td>
+        <td class="right">              Capabilities in Customer Premises Equipment (CPE) for
+</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="left">              Providing Residential IPv6 Internet Service&quot;, RFC 6092,
+</td>
+        <td>&nbsp;</td>
+        <td class="right">              Providing Residential IPv6 Internet Service&quot;, RFC 6092,
+</td>
       </tr>
       <tr>
         <td>&nbsp;</td>
@@ -1600,22 +1967,6 @@
       </tr>
       <tr>
         <td>&nbsp;</td>
-        <td class="left">   Lorenzo Colitti
-</td>
-        <td>&nbsp;</td>
-        <td class="right">   Lorenzo Colitti
-</td>
-      </tr>
-      <tr>
-        <td>&nbsp;</td>
-        <td class="left">   Google
-</td>
-        <td>&nbsp;</td>
-        <td class="right">   Google
-</td>
-      </tr>
-      <tr>
-        <td>&nbsp;</td>
         <td class="left">   Email: lorenzo@google.com
 </td>
         <td>&nbsp;</td>
@@ -1664,15 +2015,19 @@
       </tr>
       <tr>
         <td>&nbsp;</td>
-        <td class="lblock"></td>
+        <td class="left">
+</td>
         <td>&nbsp;</td>
-        <td class="rblock"></td>
+        <td class="right">
+</td>
       </tr>
       <tr>
         <td>&nbsp;</td>
-        <td class="lblock"></td>
+        <td class="left">
+</td>
         <td>&nbsp;</td>
-        <td class="rblock"></td>
+        <td class="right">
+</td>
       </tr>
       <tr>
         <td>&nbsp;</td>

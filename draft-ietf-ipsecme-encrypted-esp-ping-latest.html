@@ -33,7 +33,7 @@ Notification ESP_ECHO_SUPPORTED.
 <meta content="IPsec" name="keyword">
 <meta content="ESP" name="keyword">
 <meta content="Ping" name="keyword">
-<meta content="draft-ietf-ipsecme-encrypted-esp-ping-06" name="ietf.draft">
+<meta content="draft-ietf-ipsecme-encrypted-esp-ping-05" name="ietf.draft">
 <!-- Generator version information:
   xml2rfc 3.35.0
     Python 3.14.4
@@ -49,7 +49,7 @@ Notification ESP_ECHO_SUPPORTED.
     requests 2.32.5
     wcwidth 0.9.4
 -->
-<link href="draft-ietf-ipsecme-encrypted-esp-ping-06.xml" rel="alternate" type="application/rfc+xml">
+<link href="draft-ietf-ipsecme-encrypted-esp-ping-05.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
 <style type="text/css">/*
 
@@ -2042,7 +2042,15 @@ publication, as well as the reference to <span>[<a href="#RFC7942" class="cite x
           <dd class="break"></dd>
 <dt id="section-11.1-1.5">Description</dt>
           <dd style="margin-left: 1.5em" id="section-11.1-1.6">
-            <p id="section-11.1-1.6.1">An initial Kernel ESP Ping<a href="#section-11.1-1.6.1" class="pilcrow">¶</a></p>
+            <p id="section-11.1-1.6.1">An initial implementation of the ESP Echo Protocol in
+the Linux kernel (net/ipv4/esp_ping.c), both encrypted and unencrypted.
+It adds an IPPROTO_AGGFRAG ping socket type for IPv4 and IPv6, with a
+socket option to select the outbound SPI.  It sends and receives
+encrypted ESP Echo Request and Reply packets carried in
+AGGFRAG_PAYLOAD inside an SA, and answers requests with Echo Replies.
+Unencrypted echo using SPI values 7 and 8 is implemented, and echo
+packets bypass the SPD.  IKEv2 negotiation of ESP_ECHO_SUPPORTED is
+implemented in strongSwan. And uses busybox ping for testing.<a href="#section-11.1-1.6.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
 <dt id="section-11.1-1.7">Level of maturity</dt>
