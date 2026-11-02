@@ -21,7 +21,6 @@
 #+RFC_ADD_AUTHOR: ("Steffen Klassert" "steffen.klassert@secunet.com" ("secunet" "secunet Security Networks AG"))
 #+RFC_ADD_AUTHOR: ("Lorenzo Colitti" "lorenzo@google.com" ("Google" "Google"))
 #+RFC_ADD_AUTHOR: ("Jen Linkova" "furry@google.com" ("Google" "Google"))
-#+RFC_ADD_AUTHOR: ("Michael Richardson" "mcr+ietf@sandelman.ca" ("Sandelman" "Sandelman Software Works"))
 #+RFC_ADD_AUTHOR: ("Nathan Harold" "nharold@google.com" ("Google" "Google"))
 #+RFC_AREA: Internet
 #+RFC_WORKGROUP: IP Security Maintenance and Extensions
@@ -516,7 +515,8 @@ debug transit reachability and MTU without decrypting user traffic.
 * Acknowledgments
 
 The authors thank Tero Kivinen, Andrew McGregor, Valery Smyslov, and
-Paul Wouters for their thorough reviews and comments.
+Paul Wouters for their thorough reviews and comments. The authors also thank
+Michael Richardson for his contributions to earlier versions of this document.
 
 * Security Considerations
 
