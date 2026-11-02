@@ -6,17 +6,14 @@ IP Security Maintenance and Extensions                         A. Antony
 Internet-Draft                                               S. Klassert
 Updates: 4303, 9347 (if approved)                                secunet
 Intended status: Standards Track                              L. Colitti
-Expires: 24 April 2027                                        J. Linkova
-                                                                  Google
-                                                           M. Richardson
-                                                               Sandelman
+Expires: 6 May 2027                                           J. Linkova
                                                                N. Harold
                                                                   Google
-                                                         21 October 2026
+                                                         2 November 2026
 
 
                            ESP Echo Protocol
-                draft-ietf-ipsecme-encrypted-esp-ping-05
+                draft-ietf-ipsecme-encrypted-esp-ping-06
 
 Abstract
 
@@ -53,9 +50,12 @@ Status of This Memo
 
 
 
-Antony, et al.            Expires 24 April 2027                 [Page 1]
+
+
+
+Antony, et al.             Expires 6 May 2027                   [Page 1]
 
-Internet-Draft                  ESP Ping                    October 2026
+Internet-Draft                  ESP Ping                   November 2026
 
 
    Internet-Drafts are draft documents valid for a maximum of six months
@@ -63,7 +63,7 @@ Internet-Draft                  ESP Ping                    October 2026
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 24 April 2027.
+   This Internet-Draft will expire on 6 May 2027.
 
 Copyright Notice
 
@@ -105,17 +105,19 @@ Table of Contents
    8.  Operational Considerations  . . . . . . . . . . . . . . . . .  12
    9.  Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .  12
    10. Security Considerations . . . . . . . . . . . . . . . . . . .  13
-   11. Normative References  . . . . . . . . . . . . . . . . . . . .  13
+   11. Implementation Status . . . . . . . . . . . . . . . . . . . .  13
 
 
 
-Antony, et al.            Expires 24 April 2027                 [Page 2]
+Antony, et al.             Expires 6 May 2027                   [Page 2]
 
-Internet-Draft                  ESP Ping                    October 2026
+Internet-Draft                  ESP Ping                   November 2026
 
 
-   12. Informative References  . . . . . . . . . . . . . . . . . . .  14
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  15
+     11.1.  Linux XFRM . . . . . . . . . . . . . . . . . . . . . . .  14
+   12. Normative References  . . . . . . . . . . . . . . . . . . . .  14
+   13. Informative References  . . . . . . . . . . . . . . . . . . .  15
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  16
 
 1.  Introduction
 
@@ -163,11 +165,9 @@ Internet-Draft                  ESP Ping                    October 2026
 
 
 
-
-
-Antony, et al.            Expires 24 April 2027                 [Page 3]
+Antony, et al.             Expires 6 May 2027                   [Page 3]
 
-Internet-Draft                  ESP Ping                    October 2026
+Internet-Draft                  ESP Ping                   November 2026
 
 
    This document uses the term MOBIKE as defined in [RFC4555].  In
@@ -221,9 +221,9 @@ Internet-Draft                  ESP Ping                    October 2026
 
 
 
-Antony, et al.            Expires 24 April 2027                 [Page 4]
+Antony, et al.             Expires 6 May 2027                   [Page 4]
 
-Internet-Draft                  ESP Ping                    October 2026
+Internet-Draft                  ESP Ping                   November 2026
 
 
    policies to UDP-encapsulated ESP versus standard UDP traffic.
@@ -277,9 +277,9 @@ Internet-Draft                  ESP Ping                    October 2026
 
 
 
-Antony, et al.            Expires 24 April 2027                 [Page 5]
+Antony, et al.             Expires 6 May 2027                   [Page 5]
 
-Internet-Draft                  ESP Ping                    October 2026
+Internet-Draft                  ESP Ping                   November 2026
 
 
 3.6.  Limitations of Existing IP-Layer Tools
@@ -333,9 +333,9 @@ Internet-Draft                  ESP Ping                    October 2026
 
 
 
-Antony, et al.            Expires 24 April 2027                 [Page 6]
+Antony, et al.             Expires 6 May 2027                   [Page 6]
 
-Internet-Draft                  ESP Ping                    October 2026
+Internet-Draft                  ESP Ping                   November 2026
 
 
    *  *When to use ESP Echo*: Use the ESP Echo Protocol when verifying
@@ -389,9 +389,9 @@ Internet-Draft                  ESP Ping                    October 2026
 
 
 
-Antony, et al.            Expires 24 April 2027                 [Page 7]
+Antony, et al.             Expires 6 May 2027                   [Page 7]
 
-Internet-Draft                  ESP Ping                    October 2026
+Internet-Draft                  ESP Ping                   November 2026
 
 
 5.2.  Standalone Framing and IP-TFS Interaction
@@ -445,9 +445,9 @@ Internet-Draft                  ESP Ping                    October 2026
 
 
 
-Antony, et al.            Expires 24 April 2027                 [Page 8]
+Antony, et al.             Expires 6 May 2027                   [Page 8]
 
-Internet-Draft                  ESP Ping                    October 2026
+Internet-Draft                  ESP Ping                   November 2026
 
 
    *  Reply path SPI: 32 bits.  When R=1, specifies the target SPI for
@@ -501,9 +501,9 @@ Internet-Draft                  ESP Ping                    October 2026
 
 
 
-Antony, et al.            Expires 24 April 2027                 [Page 9]
+Antony, et al.             Expires 6 May 2027                   [Page 9]
 
-Internet-Draft                  ESP Ping                    October 2026
+Internet-Draft                  ESP Ping                   November 2026
 
 
 5.5.  Unencrypted Mode (Fixed SPI 7 and 8)
@@ -557,9 +557,9 @@ Internet-Draft                  ESP Ping                    October 2026
 
 
 
-Antony, et al.            Expires 24 April 2027                [Page 10]
+Antony, et al.             Expires 6 May 2027                  [Page 10]
 
-Internet-Draft                  ESP Ping                    October 2026
+Internet-Draft                  ESP Ping                   November 2026
 
 
    *  Intermediate network nodes permit regular ESP traffic with
@@ -613,9 +613,9 @@ Internet-Draft                  ESP Ping                    October 2026
 
 
 
-Antony, et al.            Expires 24 April 2027                [Page 11]
+Antony, et al.             Expires 6 May 2027                  [Page 11]
 
-Internet-Draft                  ESP Ping                    October 2026
+Internet-Draft                  ESP Ping                   November 2026
 
 
 7.  IANA Considerations
@@ -661,17 +661,17 @@ Internet-Draft                  ESP Ping                    October 2026
 9.  Acknowledgments
 
    The authors thank Tero Kivinen, Andrew McGregor, Valery Smyslov, and
-   Paul Wouters for their thorough reviews and comments.
+   Paul Wouters for their thorough reviews and comments.  The authors
+   also thank Michael Richardson for his contributions to earlier
+   versions of this document.
 
 
 
 
 
-
-
-Antony, et al.            Expires 24 April 2027                [Page 12]
+Antony, et al.             Expires 6 May 2027                  [Page 12]
 
-Internet-Draft                  ESP Ping                    October 2026
+Internet-Draft                  ESP Ping                   November 2026
 
 
 10.  Security Considerations
@@ -690,7 +690,60 @@ Internet-Draft                  ESP Ping                    October 2026
    7 or 8; however, within an established ESP SA, Encrypted Mode
    cryptographically authenticates all echo requests and replies.
 
-11.  Normative References
+11.  Implementation Status
+
+   [Note to RFC Editor: Please remove this section and the reference to
+   [RFC7942] before publication.]
+
+   This section records the status of known implementations of the
+   protocol defined by this specification at the time of posting of this
+   Internet-Draft, and is based on a proposal described in [RFC7942].
+   The description of implementations in this section is intended to
+   assist the IETF in its decision processes in progressing drafts to
+   RFCs.  Please note that the listing of any individual implementation
+   here does not imply endorsement by the IETF.  Furthermore, no effort
+   has been spent to verify the information presented here that was
+   supplied by IETF contributors.  This is not intended as, and must not
+   be construed to be, a catalog of available implementations or their
+   features.  Readers are advised to note that other implementations may
+   exist.
+
+   According to [RFC7942], "this will allow reviewers and working groups
+   to assign due consideration to documents that have the benefit of
+   running code, which may serve as evidence of valuable experimentation
+   and feedback that have made the implemented protocols more mature.
+   It is up to the individual working groups to use this information as
+   they see fit".
+
+   Authors are requested to add a note to the RFC Editor at the top of
+   this section, advising the Editor to remove the entire section before
+   publication, as well as the reference to [RFC7942].
+
+
+
+
+
+
+
+Antony, et al.             Expires 6 May 2027                  [Page 13]
+
+Internet-Draft                  ESP Ping                   November 2026
+
+
+11.1.  Linux XFRM
+
+   Organization  Linux kernel XFRM
+
+   Name  ESP Ping IP-TFS (https://github.com/antonyantony/linux/tree/
+      esp-ping-iptfs)
+
+   Description  An initial Kernel ESP Ping
+
+   Level of maturity  Alpha
+
+   Licensing  GPLv2
+
+12.  Normative References
 
    [AGGFRAG]  IANA, "ESP AGGFRAG_PAYLOAD Registry",
               <https://www.iana.org/assignments/esp-aggfrag-payload/esp-
@@ -725,9 +778,12 @@ Internet-Draft                  ESP Ping                    October 2026
 
 
 
-Antony, et al.            Expires 24 April 2027                [Page 13]
+
+
+
+Antony, et al.             Expires 6 May 2027                  [Page 14]
 
-Internet-Draft                  ESP Ping                    October 2026
+Internet-Draft                  ESP Ping                   November 2026
 
 
    [RFC7296]  Kaufman, C., Hoffman, P., Nir, Y., Eronen, P., and T.
@@ -750,7 +806,7 @@ Internet-Draft                  ESP Ping                    October 2026
               <https://www.iana.org/assignments/ikev2-parameters/
               ikev2-parameters.xhtml#ikev2-parameters-16>.
 
-12.  Informative References
+13.  Informative References
 
    [I-D.ietf-ipsecme-ikev2-reliable-transport]
               Smyslov, V. and T. Reddy.K, "Separate Transports for IKE
@@ -781,9 +837,9 @@ Internet-Draft                  ESP Ping                    October 2026
 
 
 
-Antony, et al.            Expires 24 April 2027                [Page 14]
+Antony, et al.             Expires 6 May 2027                  [Page 15]
 
-Internet-Draft                  ESP Ping                    October 2026
+Internet-Draft                  ESP Ping                   November 2026
 
 
    [RFC6092]  Woodyatt, J., Ed., "Recommended Simple Security
@@ -796,6 +852,11 @@ Internet-Draft                  ESP Ping                    October 2026
               "Return Path Specified Label Switched Path (LSP) Ping",
               RFC 7110, DOI 10.17487/RFC7110, January 2014,
               <https://www.rfc-editor.org/info/rfc7110>.
+
+   [RFC7942]  Sheffer, Y. and A. Farrel, "Improving Awareness of Running
+              Code: The Implementation Status Section", BCP 205,
+              RFC 7942, DOI 10.17487/RFC7942, July 2016,
+              <https://www.rfc-editor.org/info/rfc7942>.
 
    [RFC8229]  Pauly, T., Touati, S., and R. Mantha, "TCP Encapsulation
               of IKE and IPsec Packets", RFC 8229, DOI 10.17487/RFC8229,
@@ -828,18 +889,13 @@ Authors' Addresses
    Email: furry@google.com
 
 
-   Michael Richardson
-   Sandelman Software Works
-   Email: mcr+ietf@sandelman.ca
 
 
 
 
-
-
-Antony, et al.            Expires 24 April 2027                [Page 15]
+Antony, et al.             Expires 6 May 2027                  [Page 16]
 
-Internet-Draft                  ESP Ping                    October 2026
+Internet-Draft                  ESP Ping                   November 2026
 
 
    Nathan Harold
@@ -893,4 +949,4 @@ Internet-Draft                  ESP Ping                    October 2026
 
 
 
-Antony, et al.            Expires 24 April 2027                [Page 16]
+Antony, et al.             Expires 6 May 2027                  [Page 17]
